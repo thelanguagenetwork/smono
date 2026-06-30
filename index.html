@@ -1,0 +1,2433 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smono - Quit Smoking Wellness App & Interactive Prototype</title>
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Ambient Glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Main Workstation Layout -->
+  <div class="prototype-container">
+    
+    <!-- Left Sidebar: Developer Inspector & Controls -->
+    <aside class="control-panel">
+      <div class="panel-header">
+        <div class="logo-text">Smono <span>Prototype</span></div>
+        <p class="tagline">Premium, Emotionally Intelligent Quit Smoking Wellness App</p>
+      </div>
+
+      <div class="panel-section">
+        <h3>Theme Controls</h3>
+        <div class="theme-toggles">
+          <button id="toggle-light" class="theme-btn active" onclick="setAppTheme('light')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            Light Mode
+          </button>
+          <button id="toggle-dark" class="theme-btn" onclick="setAppTheme('dark')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            Dark Mode
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>Live Calculator Inputs</h3>
+        <div class="input-group">
+          <label for="calc-name">User's Name</label>
+          <input type="text" id="calc-name" value="Siddhi" oninput="updateCalculatorInputs()">
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="calc-qty">Cigarettes / Day</label>
+            <input type="number" id="calc-qty" value="15" min="1" max="100" oninput="updateCalculatorInputs()">
+          </div>
+          <div class="input-group">
+            <label for="calc-cost">Cost per pack (20 cigs)</label>
+            <input type="number" id="calc-cost" value="12.00" step="0.5" oninput="updateCalculatorInputs()">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="calc-years">Years Smoked</label>
+          <input type="number" id="calc-years" value="8" min="1" max="60" oninput="updateCalculatorInputs()">
+        </div>
+        <div class="calc-preview-badge">
+          <span>Life Saved Rate:</span>
+          <strong>11 mins per cigarette</strong>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>Program Level</h3>
+        <div class="program-access-toggles">
+          <button id="toggle-unpaid" class="access-btn active" onclick="setProgramAccess(false)">
+            Free Tier (Day 1 Unlocked)
+          </button>
+          <button id="toggle-paid" class="access-btn" onclick="setProgramAccess(true)">
+            Premium Tier (All Days Unlocked)
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section screen-selector-section">
+        <h3>Screen Jumper (15+ States)</h3>
+        
+        <div class="screen-group">
+          <h4>1. Welcome Flow</h4>
+          <button class="jump-btn active" onclick="jumpToScreen('welcome-1')">Welcome 1: Intro & Language</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-2')">Welcome 2: Guidance</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-3')">Welcome 3: Pain Points</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-4')">Welcome 4: Outcome</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-5')">Welcome 5: Understanding</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-6')">Welcome 6: Desire Cease</button>
+          <button class="jump-btn" onclick="jumpToScreen('welcome-7')">Welcome 7: Freedom Gain</button>
+        </div>
+
+        <div class="screen-group">
+          <h4>2. Authentication</h4>
+          <button class="jump-btn" onclick="jumpToScreen('login')">Phone Login</button>
+          <button class="jump-btn" onclick="jumpToScreen('otp')">Verify OTP</button>
+          <button class="jump-btn" onclick="jumpToScreen('notifications')">Notifications Opt-in</button>
+        </div>
+
+        <div class="screen-group">
+          <h4>3. Questionnaire Flow</h4>
+          <button class="jump-btn" onclick="jumpToScreen('questionnaire-intro')">Questionnaire Intro</button>
+          <button class="jump-btn" onclick="startQuestionnaire(1)">Questionnaire Start (Q1)</button>
+          <button class="jump-btn" onclick="startQuestionnaire(5)">Cigarette Details (Q5)</button>
+          <button class="jump-btn" onclick="startQuestionnaire(10)">Why Quit? (Q10)</button>
+          <button class="jump-btn" onclick="startQuestionnaire(17)">Journey Style (Q17)</button>
+          <button class="jump-btn" onclick="startQuestionnaire(34)">Final Commitment (Q34)</button>
+        </div>
+
+        <div class="screen-group">
+          <h4>4. Interstitial Insights & Loader</h4>
+          <button class="jump-btn" onclick="jumpToScreen('pillars-interstitial')">Pillars Interstitial</button>
+          <button class="jump-btn" onclick="jumpToScreen('insight-spent')">Cost Reveal Card</button>
+          <button class="jump-btn" onclick="jumpToScreen('insight-time-spent')">Time Spent Card</button>
+          <button class="jump-btn" onclick="jumpToScreen('insight-health-impact')">Health Toll Card</button>
+          <button class="jump-btn" onclick="jumpToScreen('insight-transform')">Reclaim Gains Card</button>
+          <button class="jump-btn" onclick="jumpToScreen('testimonial-interstitial')">Quit Testimonial</button>
+          <button class="jump-btn" onclick="jumpToScreen('loading')">Personalizing Plan Loader</button>
+        </div>
+
+        <div class="screen-group">
+          <h4>5. Sales / Checkout & Objections</h4>
+          <button class="jump-btn" onclick="jumpToScreen('offer')">Sales Page (Offer)</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-survey')">Objection: Unsure Survey</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-app-help')">Objection: How App Helps</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-not-pay')">Objection: Don't Want to Pay</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-later')">Objection: I'll Do it Later</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-own')">Objection: Quit on My Own</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-expensive')">Objection: Feels Expensive</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-cravings')">Objection: Cravings Fear</button>
+          <button class="jump-btn" onclick="jumpToScreen('objection-cost')">Objection: Price Perspective</button>
+        </div>
+
+        <div class="screen-group">
+          <h4>6. Core App Dashboard</h4>
+          <button class="jump-btn" onclick="jumpToScreen('home')">Home: Daily Program Tracker</button>
+          <button class="jump-btn" onclick="jumpToScreen('tracker')">Tracker: My Smono Progress</button>
+          <button class="jump-btn" onclick="jumpToScreen('health')">Health: Body Recovery</button>
+          <button class="jump-btn" onclick="jumpToScreen('community')">Community: Smono Circle</button>
+          <button class="jump-btn" onclick="jumpToScreen('profile')">Profile: Achievements & Info</button>
+          <button class="jump-btn" onclick="jumpToScreen('settings')">Settings Sheet</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Sandbox: Interactive iPhone Device Simulator -->
+    <main class="simulator-wrapper">
+      <div class="iphone-shell">
+        <div class="iphone-bezel">
+          <!-- Dynamic Island/Notch -->
+          <div class="dynamic-island">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+          </div>
+          
+          <!-- Screen Viewport -->
+          <div class="phone-screen" id="phone-screen-viewport">
+            
+            <!-- iOS Status Bar -->
+            <header class="ios-status-bar">
+              <span id="ios-time" class="status-time">09:41</span>
+              <div class="status-icons">
+                <svg width="17" height="11" fill="currentColor" viewBox="0 0 17 11"><path d="M2 3h1v5H2zM4 2h1v6H4zM6 1h1v7H6zM8 0h1v8H8z"/></svg>
+                <svg width="15" height="11" fill="currentColor" viewBox="0 0 15 11"><path d="M13.85 2a8 8 0 00-12.7 0c-.2.24-.2.6 0 .84l1.2 1.2c.2.2.54.2.74 0a5 5 0 018.1 0c.2.2.55.2.75 0l1.2-1.2c.2-.24.2-.6 0-.84z"/></svg>
+                <div class="battery-icon">
+                  <div class="battery-body"></div>
+                  <div class="battery-level"></div>
+                </div>
+              </div>
+            </header>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 1: Welcome Carousel Slide 1 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-1" class="screen-view active">
+              <!-- Marked Logo Addition Area -->
+              <div class="logo-placeholder-area">
+                [ Logo Space ]
+              </div>
+
+              <!-- Centered Clean Welcome Header -->
+              <div class="welcome-header text-center mt-20">
+                <h1 class="welcome-title text-center">Congratulations,<br>your quit journey begins.</h1>
+                <p class="welcome-subtitle text-center mt-10">You have taken the first step toward reclaiming your health, energy, and freedom.</p>
+              </div>
+
+              <!-- Space buffer to keep the layout clean and balanced -->
+              <div style="flex-grow: 1; min-height: 40px;"></div>
+
+              <!-- Clean Language Picker -->
+              <div class="language-picker-container">
+                <label for="language-select">Preferred Language</label>
+                <div class="custom-select-wrapper">
+                  <select id="language-select" class="theme-select" onchange="changeWelcomeLanguage()">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="de">Deutsch (German)</option>
+                    <option value="it">Italiano (Italian)</option>
+                    <option value="es">Español (Spanish)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Bottom CTA Only -->
+              <div class="screen-footer">
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-2')">Get Started</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 2: Welcome Carousel Slide 2 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-2" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title-large">Quit smoking in 10 days,</h1>
+                <h2 class="welcome-title-medium">without cravings, guilt, or willpower.</h2>
+                <p class="welcome-subtitle-small">A personalised app-based program that helps you stop smoking forever.</p>
+              </div>
+
+              <!-- Minimal progress timeline widget representing the 10 days journey -->
+              <div class="mini-timeline-widget glass-card">
+                <div class="timeline-step">
+                  <div class="step-dot">1</div>
+                  <span>Trigger Map</span>
+                </div>
+                <div class="timeline-line"></div>
+                <div class="timeline-step">
+                  <div class="step-dot">5</div>
+                  <span>Desire Reset</span>
+                </div>
+                <div class="timeline-line"></div>
+                <div class="timeline-step">
+                  <div class="step-dot">10</div>
+                  <span>Free Forever</span>
+                </div>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-3')">Next</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 3: Welcome Carousel Slide 3 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-3" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title">Don’t Just Quit.<br>Stop Wanting It.</h1>
+                <p class="welcome-subtitle">The real win is not resisting cigarettes. It is not needing them.</p>
+              </div>
+
+              <div class="freedom-concept-card glass-card">
+                <div class="freedom-badge">THE SMONO RESET METHOD</div>
+                <p class="freedom-body-text">Most quit methods focus on stopping the cigarette. Smono focuses on removing the desire behind it, so quitting feels less like sacrifice and more like freedom.</p>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-4')">Next</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 4: Welcome Carousel Slide 4 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-4" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title">A healthier, freer<br>version of you.</h1>
+                <p class="welcome-subtitle">Save money, regain energy, breathe better, and build a smoke-free life, one day at a time.</p>
+              </div>
+
+              <div class="visual-gains-carousel">
+                <div class="gain-item-row">
+                  <div class="gain-badge green-badge">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Save Money</span>
+                  </div>
+                  <div class="gain-badge blue-badge">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <span>Lungs Recovery</span>
+                  </div>
+                </div>
+                <div class="gain-item-row">
+                  <div class="gain-badge orange-badge">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>Regain Control</span>
+                  </div>
+                  <div class="gain-badge purple-badge">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                    <span>Breathe Better</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-5')">Next</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 5: Welcome Carousel Slide 5 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-5" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title">Designed by people who understand smokers.</h1>
+                <p class="welcome-subtitle">From 20+ cigarettes per day to a happy, smoke free life. If they can do it, you can do it too!</p>
+              </div>
+
+              <!-- Comparison visualization element -->
+              <div class="smoker-compare-element glass-card">
+                <div class="compare-side before">
+                  <div class="compare-icon">🚬 20+</div>
+                  <span>Cigs Per Day</span>
+                </div>
+                <div class="compare-arrow">➔</div>
+                <div class="compare-side after">
+                  <div class="compare-icon">🍃 Free</div>
+                  <span>Happy & Clean</span>
+                </div>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-6')">Next</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 6: Welcome Carousel Slide 6 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-6" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title">Built to remove the desire to smoke.</h1>
+                <p class="welcome-subtitle">This 10 day transformation program has helped 10,000+ people across 30 countries smoke-free. We want you to be one of them.</p>
+              </div>
+
+              <!-- Global stats widget element -->
+              <div class="global-stats-element glass-card">
+                <div class="stat-bubble">
+                  <h3>10,000+</h3>
+                  <span>Quitters Guided</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-bubble">
+                  <h3>30+</h3>
+                  <span>Countries Active</span>
+                </div>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                  <span class="dot"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('welcome-7')">Next</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 7: Welcome Carousel Slide 7 -->
+            <!-- ============================================ -->
+            <section id="screen-welcome-7" class="screen-view">
+              <div class="welcome-header">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                <h1 class="welcome-title">Quit without guilt, shame, willpower or lifestyle panic.</h1>
+                <p class="welcome-subtitle">You are not giving something up; you are getting your freedom, health, and savings back.</p>
+              </div>
+
+              <!-- Benefits Pilled Elements -->
+              <div class="benefits-gained-row">
+                <div class="benefit-gain-pill green">💸 Savings</div>
+                <div class="benefit-gain-pill blue">🫁 Health</div>
+                <div class="benefit-gain-pill orange">🕊️ Freedom</div>
+              </div>
+
+              <!-- Bottom Indicator & CTAs -->
+              <div class="screen-footer">
+                <div class="carousel-dots">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot active"></span>
+                </div>
+                <button class="btn btn-primary" onclick="jumpToScreen('login')">Continue</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 5: Phone Login -->
+            <!-- ============================================ -->
+            <section id="screen-login" class="screen-view">
+              <div class="login-container">
+                <div class="app-logo centered">
+                  <div class="logo-mark big"></div>
+                  <h2 class="logo-name text-center">Welcome to Smono</h2>
+                  <p class="welcome-subtitle text-center">Log in to start your personalised quit journey.</p>
+                </div>
+
+                <div class="login-form-fields">
+                  <!-- Phone Number Field -->
+                  <div class="input-phone-wrapper">
+                    <span class="phone-prefix">+91</span>
+                    <input type="tel" id="login-phone" placeholder="98765 43210" class="theme-input">
+                  </div>
+
+                  <button class="btn btn-primary w-full" onclick="handleSendOTP()">Continue with OTP</button>
+                  
+                  <div class="or-separator"><span>or</span></div>
+
+                  <!-- Social Logins -->
+                  <button class="btn btn-social btn-google" onclick="handleSocialLogin('Google')">
+                    <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20">
+                      <path fill="#EA4335" d="M12 5.04c1.67 0 3.19.57 4.37 1.71l3.26-3.26C17.65 1.54 14.99 1 12 1 7.35 1 3.37 3.65 1.39 7.5l3.85 2.99C6.18 7.37 8.84 5.04 12 5.04z"/>
+                      <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.44h6.45c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.38-4.88 3.38-8.49z"/>
+                      <path fill="#FBBC05" d="M5.24 14.49A7.16 7.16 0 014.8 12c0-.87.15-1.72.44-2.49L1.39 6.51A11.96 11.96 0 000 12c0 2.01.5 3.91 1.39 5.49l3.85-3z"/>
+                      <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.66-2.84c-1.1.74-2.52 1.18-4.3 1.18-3.16 0-5.82-2.33-6.78-5.46L1.39 15.95C3.37 19.8 7.35 23 12 23z"/>
+                    </svg>
+                    Continue with Google
+                  </button>
+                  
+                  <button class="btn btn-social btn-apple" onclick="handleSocialLogin('Apple')">
+                    <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.82M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.98.67.05 2.32-.61 2.98-1.42z"/>
+                    </svg>
+                    Continue with Apple
+                  </button>
+                </div>
+
+                <div class="login-footer-helpers">
+                  <p class="terms-helper">By logging in, you agree to our <a href="#" onclick="alert('Opening Privacy Policy...')">privacy policy</a> and <a href="#" onclick="alert('Opening Terms of Service...')">terms of service</a>.</p>
+                  <p class="privacy-helper">We keep your information private and secure.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 6: Verify OTP -->
+            <!-- ============================================ -->
+            <section id="screen-otp" class="screen-view">
+              <div class="login-container">
+                <button class="back-circle" onclick="jumpToScreen('login')">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                
+                <div class="app-logo centered mt-20">
+                  <h2 class="logo-name text-center">Verify your number</h2>
+                  <p class="welcome-subtitle text-center">Enter the code sent to your phone <span id="otp-phone-display">+91 ••••• ••210</span>.</p>
+                </div>
+
+                <!-- 6 Digit Input Boxes -->
+                <div class="otp-inputs-row">
+                  <input type="text" maxlength="1" class="otp-box active" value="7" onkeyup="moveOtpNext(this)">
+                  <input type="text" maxlength="1" class="otp-box" value="4" onkeyup="moveOtpNext(this)">
+                  <input type="text" maxlength="1" class="otp-box" value="8" onkeyup="moveOtpNext(this)">
+                  <input type="text" maxlength="1" class="otp-box" placeholder="-" onkeyup="moveOtpNext(this)">
+                  <input type="text" maxlength="1" class="otp-box" placeholder="-" onkeyup="moveOtpNext(this)">
+                  <input type="text" maxlength="1" class="otp-box" placeholder="-" onkeyup="moveOtpNext(this)">
+                </div>
+
+                <div class="timer-row">
+                  <span>Resend code in</span>
+                  <strong class="timer-digits">0:47</strong>
+                </div>
+
+                <button class="btn btn-primary w-full mt-20" onclick="handleVerifyOTP()">Verify</button>
+                
+                <button class="btn btn-link w-full text-center mt-10 disabled" id="resend-code-btn">Resend code</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 7: Notification Permission -->
+            <!-- ============================================ -->
+            <section id="screen-notifications" class="screen-view">
+              <div class="notification-container">
+                <div class="notif-illu-card">
+                  <!-- Cute alarm clock with hearts and stars -->
+                  <div class="illu-bell-pulse">
+                    <svg viewBox="0 0 100 100" width="80" height="80">
+                      <circle cx="50" cy="50" r="45" fill="var(--color-sky-soft)" opacity="0.3"/>
+                      <path d="M50 20a15 15 0 00-15 15v15l-5 5v3h40v-3l-5-5V35a15 15 0 00-15-15z" fill="var(--color-primary-green)" />
+                      <circle cx="50" cy="65" r="4" fill="var(--color-accent-orange)" />
+                      <!-- Sparkles -->
+                      <path d="M25 25l3 3M75 25l-3 3M15 50h4M81 50h4" stroke="var(--color-accent-orange)" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <h1 class="welcome-title text-center">Stay supported, every day</h1>
+                <p class="welcome-subtitle text-center">Enable notifications to get daily reminders, motivation, progress nudges, and program updates.</p>
+
+                <div class="benefits-list glass-card">
+                  <div class="benefit-item">
+                    <span class="bullet-check">✓</span>
+                    <span>Daily program module reminders</span>
+                  </div>
+                  <div class="benefit-item">
+                    <span class="bullet-check">✓</span>
+                    <span>Instant craving support prompts</span>
+                  </div>
+                  <div class="benefit-item">
+                    <span class="bullet-check">✓</span>
+                    <span>Weekly progress and savings check-ins</span>
+                  </div>
+                  <div class="benefit-item">
+                    <span class="bullet-check">✓</span>
+                    <span>Encouragement when you need it most</span>
+                  </div>
+                </div>
+
+                <!-- Footer CTAs -->
+                <div class="screen-footer vertical">
+                  <button class="btn btn-primary w-full" onclick="handleNotificationsOptIn(true)">Enable Notifications</button>
+                  <button class="btn btn-secondary w-full" onclick="handleNotificationsOptIn(false)">Maybe Later</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 7.5: Onboarding Questionnaire Intro -->
+            <!-- ============================================ -->
+            <section id="screen-questionnaire-intro" class="screen-view">
+              <div class="login-container">
+                <button class="back-circle" onclick="jumpToScreen('notifications')">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                
+                <div class="app-logo centered mt-20">
+                  <div class="logo-mark big"></div>
+                  <h2 class="logo-name text-center">WELCOME TO SMONO</h2>
+                  <p class="welcome-subtitle text-center mt-5">You can become a happy smoke-free person.</p>
+                </div>
+
+                <div class="intro-wellness-card glass-card mt-15">
+                  <div class="intro-empathy-bullets">
+                    <div class="empathy-bullet">
+                      <span class="cross-icon">✕</span>
+                      <span>Not by forcing yourself</span>
+                    </div>
+                    <div class="empathy-bullet">
+                      <span class="cross-icon">✕</span>
+                      <span>Not by fighting cravings</span>
+                    </div>
+                    <div class="empathy-bullet">
+                      <span class="cross-icon">✕</span>
+                      <span>Not by feeling guilty</span>
+                    </div>
+                  </div>
+                  
+                  <div class="divider mt-10"></div>
+                  
+                  <p class="intro-reassurance-text mt-15">
+                    First, let’s understand your smoking journey so Smono can build a plan that feels personal, practical, and easy to follow.
+                  </p>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="startQuestionnaire(1)">Continue</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 8: Onboarding Questionnaire Flow -->
+            <!-- ============================================ -->
+            <section id="screen-questionnaire" class="screen-view">
+              <!-- Questionnaire Header -->
+              <header class="quest-header">
+                <button class="back-circle-small" onclick="handleQuestionBack()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="quest-progress-bar-wrapper">
+                  <div class="quest-progress-bar" id="questionnaire-progress"></div>
+                </div>
+                <span class="quest-indicator" id="questionnaire-indicator">Question 1 of 34</span>
+              </header>
+
+              <!-- Question Content Container -->
+              <div class="quest-content">
+                <h2 class="quest-title" id="question-text">What form of nicotine do you consume?</h2>
+                <p class="quest-support-text" id="question-support">Choose the option that describes your primary habit.</p>
+
+                <!-- Options rendered dynamically in app.js -->
+                <div class="quest-options" id="question-options-container">
+                  <!-- Example Option -->
+                  <div class="option-card active">
+                    <span class="option-label">Cigarettes</span>
+                    <span class="option-check"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Questionnaire Footer -->
+              <div class="quest-footer">
+                <button class="btn btn-primary w-full" id="question-next-btn" onclick="handleQuestionNext()">Continue</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 8.5: Onboarding Pillars Interstitial -->
+            <!-- ============================================ -->
+            <section id="screen-pillars-interstitial" class="screen-view">
+              <div class="login-container">
+                <button class="back-circle" onclick="goBackFromPillars()">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                
+                <div class="app-logo centered mt-25">
+                  <div class="logo-mark"></div>
+                  <h2 class="logo-name text-center">YOU’RE IN THE RIGHT PLACE</h2>
+                  <p class="welcome-subtitle text-center mt-5">Smono brings together four powerful pillars:</p>
+                </div>
+
+                <div class="pillars-list-container">
+                  <div class="pillar-item-card glass-card">
+                    <span class="pillar-icon">🧠</span>
+                    <span class="pillar-text">Cognitive behaviour change</span>
+                  </div>
+                  <div class="pillar-item-card glass-card">
+                    <span class="pillar-icon">⚡</span>
+                    <span class="pillar-text">Neural retraining</span>
+                  </div>
+                  <div class="pillar-item-card glass-card">
+                    <span class="pillar-icon">🍃</span>
+                    <span class="pillar-text">Mindfulness and craving control</span>
+                  </div>
+                  <div class="pillar-item-card glass-card">
+                    <span class="pillar-icon">🤝</span>
+                    <span class="pillar-text">1:1 support and community motivation</span>
+                  </div>
+                </div>
+
+                <p class="pillars-conclusion-text">
+                  <strong>This is not just a tracker.</strong><br>
+                  This is a structured program designed to help you change how you think and feel about smoking.
+                </p>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="resumeQuestionnaireAfterPillars()">Continue</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 9: Interstitial Insight - Spent -->
+            <!-- ============================================ -->
+            <section id="screen-insight-spent" class="screen-view">
+              <div class="insight-container">
+                <div class="insight-pill">Emotional Reality Check</div>
+                <h2 class="welcome-title mt-10">This habit has cost more than you think.</h2>
+                <p class="welcome-subtitle">Based on your entries, here is the direct financial cost of smoking:</p>
+
+                <div class="insight-grid">
+                  <div class="stat-insight-card glass-card span-2 highlight">
+                    <span class="label">Total Lifetime Spend</span>
+                    <h3 class="value count-up-trigger" id="insight-spent-lifetime">$21,900</h3>
+                    <p class="desc">That's money burnt directly on cigarettes.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Monthly Cost</span>
+                    <h3 class="value" id="insight-spent-monthly">$273</h3>
+                    <p class="desc">Every single month.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Yearly Cost</span>
+                    <h3 class="value" id="insight-spent-yearly">$3,285</h3>
+                    <p class="desc">Could buy a premium holiday.</p>
+                  </div>
+                </div>
+
+                <div class="insight-quote-box glass-card mt-20">
+                  <p>"Seeing that total lifetime number was a shock. It felt like I was literally burning my savings."</p>
+                  <span class="author">— Siddhi, quit with Smono</span>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="jumpToScreen('insight-time-spent')">Next Insight</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 9.5: Interstitial Insight - Time Spent -->
+            <!-- ============================================ -->
+            <section id="screen-insight-time-spent" class="screen-view">
+              <div class="insight-container">
+                <div class="insight-pill blue">Time Reality Check</div>
+                <h2 class="welcome-title mt-10">Hours lost that you'll never get back.</h2>
+                <p class="welcome-subtitle">Based on your smoking speed, here is the cumulative time spent smoking:</p>
+
+                <div class="insight-grid">
+                  <div class="stat-insight-card glass-card span-2 blue-glow">
+                    <span class="label">Total Days Active Smoking</span>
+                    <h3 class="value color-blue" id="insight-time-spent-days">124 Days</h3>
+                    <p class="desc" id="insight-time-spent-desc">Toll calculated at 7 minutes per cigarette.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Total Hours Spent</span>
+                    <h3 class="value" id="insight-time-spent-hours">2,980 Hours</h3>
+                    <p class="desc">Direct active smoking breaks.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Active Minutes Spent</span>
+                    <h3 class="value" id="insight-time-spent-mins">178,800m</h3>
+                    <p class="desc">Hands-busy smoking time.</p>
+                  </div>
+                </div>
+
+                <div class="info-alert-card glass-card mt-15 blue-border">
+                  <div class="alert-icon">🕒</div>
+                  <div class="alert-text">
+                    <h4>Reclaim your life calendar</h4>
+                    <p>Cessation releases hundreds of hours back into your year. Smono modules take just 5 minutes a day to keep you free.</p>
+                  </div>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="jumpToScreen('insight-health-impact')">Next Insight</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 10: Interstitial Insight - Health Toll -->
+            <!-- ============================================ -->
+            <section id="screen-insight-health-impact" class="screen-view">
+              <div class="insight-container">
+                <div class="insight-pill orange">Physical Reality Check</div>
+                <h2 class="welcome-title mt-10">Here's what smoking may have taken from you.</h2>
+                <p class="welcome-subtitle">Your body has absorbed significant stress and toxicity over the years.</p>
+
+                <div class="insight-grid">
+                  <div class="stat-insight-card glass-card span-2 orange-glow">
+                    <span class="label">Estimated Cigarettes Smoked</span>
+                    <h3 class="value color-orange" id="insight-cigs-count">43,800</h3>
+                    <p class="desc">Inhaled directly into your lungs.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Life Minutes Lost</span>
+                    <h3 class="value" id="insight-life-lost">33 days</h3>
+                    <p class="desc">Calculated at 11m/cigs.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Carbon Monoxide Toll</span>
+                    <h3 class="value">High</h3>
+                    <p class="desc">Reduced blood oxygenation.</p>
+                  </div>
+                </div>
+
+                <div class="info-alert-card glass-card mt-15 orange-border">
+                  <div class="alert-icon">⚠️</div>
+                  <div class="alert-text">
+                    <h4>Every puff counts</h4>
+                    <p>But the damage is reversible. The human body begins repairing itself within 20 minutes of your last cigarette.</p>
+                  </div>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="jumpToScreen('insight-transform')">Next Insight</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 11: Interstitial Insight - Transform -->
+            <!-- ============================================ -->
+            <section id="screen-insight-transform" class="screen-view">
+              <div class="insight-container">
+                <div class="insight-pill green">Your Reclaimed Future</div>
+                <h2 class="welcome-title mt-10">Now imagine what you could regain.</h2>
+                <p class="welcome-subtitle">By choosing a smoke-free life starting today, your next year will look like a major victory:</p>
+
+                <div class="insight-grid">
+                  <div class="stat-insight-card glass-card span-2 green-glow">
+                    <span class="label">Cash Saved in Next Year</span>
+                    <h3 class="value color-green" id="insight-save-year">$3,285</h3>
+                    <p class="desc">What will you reward yourself with?</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Cigarettes Avoided</span>
+                    <h3 class="value" id="insight-avoided-year">5,475</h3>
+                    <p class="desc">Saving your lung capacity.</p>
+                  </div>
+                  <div class="stat-insight-card glass-card">
+                    <span class="label">Breathing Quality</span>
+                    <h3 class="value">+80%</h3>
+                    <p class="desc">Increased oxygen rate.</p>
+                  </div>
+                </div>
+
+                <div class="success-gain-card glass-card mt-15 green-border">
+                  <div class="gain-circle-tick">✓</div>
+                  <div class="gain-content">
+                    <h4>The Smono Guarantee</h4>
+                    <p>A guilt-free program focusing on trigger replacement, craving management, and positive habits.</p>
+                  </div>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="jumpToScreen('testimonial-interstitial')">Continue</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 12: Interstitial Testimonials -->
+            <!-- ============================================ -->
+            <section id="screen-testimonial-interstitial" class="screen-view">
+              <div class="testimonial-page">
+                <div class="app-logo">
+                  <div class="logo-mark"></div>
+                  <span class="logo-name">Smono</span>
+                </div>
+                
+                <h2 class="welcome-title mt-20 text-center">Real stories from real quitters</h2>
+                <p class="welcome-subtitle text-center">You are not alone in this journey. Thousands have taken this system-based path.</p>
+
+                <div class="testimonial-scroller">
+                  <div class="testimonial-bubble glass-card active">
+                    <div class="stars-rating">★★★★★</div>
+                    <p class="quote">"I thought I lacked willpower. I actually lacked the right system. Smono taught me how to manage my mornings without stress."</p>
+                    <div class="author-info">
+                      <div class="avatar-small av-1"></div>
+                      <div>
+                        <h4>Vikram S.</h4>
+                        <span>Smoke-free for 11 months</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="social-proof-banner mt-20">
+                    <div class="stat-col">
+                      <h3>12,400+</h3>
+                      <span>Users Guided</span>
+                    </div>
+                    <div class="stat-col">
+                      <h3>91%</h3>
+                      <span>Success Rate</span>
+                    </div>
+                    <div class="stat-col">
+                      <h3>$1.4M+</h3>
+                      <span>Total Saved</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="screen-footer">
+                  <button class="btn btn-primary w-full" onclick="resumeQuestionnaireAfterTestimonial()">Return to Questionnaire</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 13: Personalising Plan Loading Screen -->
+            <!-- ============================================ -->
+            <section id="screen-loading" class="screen-view">
+              <div class="loading-page">
+                <div class="loading-animation-container">
+                  <!-- Animated pulsing radial ring -->
+                  <div class="pulse-ring"></div>
+                  <div class="pulse-ring-inner"></div>
+                  <div class="loading-logo-glow"></div>
+                </div>
+
+                <h2 class="welcome-title text-center mt-30">Creating your personalised quit plan</h2>
+                <p class="welcome-subtitle text-center" id="loading-ticker">Analysing your smoking patterns...</p>
+
+                <div class="loading-progress-track">
+                  <div class="loading-progress-bar" id="loading-bar-fill"></div>
+                </div>
+
+                <div class="checklist-loader">
+                  <div class="check-item done" id="check-item-1">
+                    <span class="loader-circle-check">✓</span>
+                    <span>Analyzing triggers and daily schedules</span>
+                  </div>
+                  <div class="check-item" id="check-item-2">
+                    <span class="loader-circle-check">✓</span>
+                    <span>Calculating nicotine withdrawal timeline</span>
+                  </div>
+                  <div class="check-item" id="check-item-3">
+                    <span class="loader-circle-check">✓</span>
+                    <span>Creating your daily 30-day modules</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 14: Sales / Offer Page -->
+            <!-- ============================================ -->
+            <section id="screen-offer" class="screen-view">
+              <div class="offer-page-content">
+                <div class="offer-header">
+                  <div class="offer-seal">✓ Custom Plan Ready</div>
+                  <h2 class="offer-title">Your personalised Smono program is ready</h2>
+                  <p class="offer-subtitle">A guided quit smoking plan designed around your habits, triggers, and goals.</p>
+                </div>
+
+                <!-- Price Card -->
+                <div class="price-premium-card glass-card">
+                  <div class="best-value-ribbon">Most Popular</div>
+                  <div class="price-row">
+                    <div class="price-title">30-Day Smoke Free Program</div>
+                    <div class="price-details">
+                      <span class="old-price" id="offer-price-old">$49.99</span>
+                      <strong class="new-price" id="offer-price-new">$19.99</strong>
+                    </div>
+                  </div>
+                  <p class="price-caption">One-time payment. Full lifetime access to all future modules.</p>
+                  
+                  <div class="divider"></div>
+
+                  <div class="savings-comparison">
+                    <p>Compared to your weekly smoking spend of <strong id="offer-spent-weekly">$63.00</strong>, this program pays for itself in less than **3 days**.</p>
+                  </div>
+                </div>
+
+                <!-- Program Value Stack -->
+                <div class="value-stack-list">
+                  <h3>What is included in Smono Premium:</h3>
+                  
+                  <div class="value-item">
+                    <div class="val-icon">🗓️</div>
+                    <div class="val-desc">
+                      <h4>Day-wise 30 Modules</h4>
+                      <p>5-minute daily behavioral exercises for your specific trigger patterns.</p>
+                    </div>
+                  </div>
+
+                  <div class="value-item">
+                    <div class="val-icon">🚨</div>
+                    <div class="val-desc">
+                      <h4>SOS Craving Rescue Button</h4>
+                      <p>Instant breathwork and audio triggers to survive strong cravings.</p>
+                    </div>
+                  </div>
+
+                  <div class="value-item">
+                    <div class="val-icon">📊</div>
+                    <div class="val-desc">
+                      <h4>Body Vitals & Recovery Tracker</h4>
+                      <p>Live health indicator widgets tracing your heart and lung restoration.</p>
+                    </div>
+                  </div>
+
+                  <div class="value-item">
+                    <div class="val-icon">❤️</div>
+                    <div class="val-desc">
+                      <h4>Guilt-free Daily Reflections</h4>
+                      <p>Supportive habit coaching designed by behavioral scientists.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Trust signals -->
+                <div class="trust-signals">
+                  <span>🔒 256-bit Secure Encryption</span>
+                  <span>🤝 14-Day Refund Guarantee</span>
+                </div>
+              </div>
+
+              <!-- Sticky Sales Bottom CTAs -->
+              <div class="offer-sticky-footer">
+                <button class="btn btn-primary w-full btn-large shadow-pulse" onclick="handlePurchaseSuccess()">Start My Program</button>
+                <button class="btn btn-link w-full text-center mt-5" onclick="triggerObjectionHandling()">I am not sure</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 15.8: Objection Unsure Survey         -->
+            <!-- ============================================ -->
+            <section id="screen-objection-survey" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('offer')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Help us understand</span>
+              </header>
+
+              <div style="padding: 10px 20px 25px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto;">
+                <!-- Header -->
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.4; margin-top: 0; margin-bottom: 8px; color: var(--color-text-primary);">
+                  What is making you unsure about starting your <span style="color: var(--color-accent-sky);">smoke-free</span> journey today?
+                </h2>
+                <p style="font-size: 11px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 20px;">
+                  Select all that apply.
+                </p>
+
+                <!-- Checkboxes list -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                  
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I’m not sure an app can help me quit.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I don’t want to pay for an app.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I am afraid of cravings</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I want to subscribe, but the program feels expensive.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I’m too busy right now. I might do it later.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I’m thinking of quitting on my own.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I only want to use the tracker for now.</span>
+                  </label>
+
+                  <label class="survey-option-label" onclick="toggleSurveySelection(this)" style="display: flex; align-items: flex-start; gap: 12px; background: var(--color-bg-card); border: 1.5px solid var(--color-border-card); border-radius: 14px; padding: 12px 14px; cursor: pointer; transition: all 0.2s;">
+                    <input type="checkbox" class="survey-check" style="margin-top: 2px; accent-color: var(--color-accent-sky);" />
+                    <span style="font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary);">I want to try the program first before subscribing.</span>
+                  </label>
+
+                </div>
+                <!-- Submit button inline at the bottom of the list -->
+                <button class="btn btn-primary w-full btn-large mt-15 mb-25" onclick="submitObjectionSurvey()">SUBMIT</button>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 15: Objection Handling - Cravings -->
+            <!-- ============================================ -->
+            <section id="screen-objection-cravings" class="screen-view">
+              <div class="objection-page">
+                <div class="objection-badge">Support Desk</div>
+                <h2 class="welcome-title mt-10">Afraid of intense cravings?</h2>
+                <p class="welcome-subtitle">It is completely natural to feel anxious about the physical urge to smoke. We designed Smono to guide you through them.</p>
+
+                <div class="objection-content-card glass-card">
+                  <div class="obj-science">
+                    <h4>The Science: Cravings only last 10 minutes</h4>
+                    <p>A craving reaches peak intensity and naturally subsides within 10 minutes. Smono provides interactive, real-time audio and breath triggers to help you navigate those specific 10 minutes, shame-free.</p>
+                  </div>
+                  
+                  <div class="sos-tool-preview">
+                    <span>SOS Tool Preview:</span>
+                    <div class="mini-sos-btn">
+                      <div class="pulse-ring-sos"></div>
+                      🚨 SOS Panic Button
+                    </div>
+                  </div>
+                </div>
+
+                <div class="objection-benefits">
+                  <div class="ob-item">✓ Guided box breathing modules</div>
+                  <div class="ob-item">✓ Positive cognitive reframing cards</div>
+                  <div class="ob-item">✓ Instant physical trigger distraction checklist</div>
+                </div>
+
+                <div class="screen-footer vertical">
+                  <button class="btn btn-primary w-full" onclick="handlePurchaseSuccess()">Try the Guided Journey</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">Next Concern</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16.1: Objection - How Can An App Help -->
+            <!-- ============================================ -->
+            <section id="screen-objection-app-help" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('objection-survey')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Efficacy</span>
+              </header>
+
+              <div style="padding: 20px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto; gap: 14px;">
+                
+                <div style="background: var(--color-bg-card); border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-accent-sky); border: 1px solid var(--color-border-card); align-self: flex-start;">
+                  Methodology
+                </div>
+
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.35; color: var(--color-text-primary); margin: 0;">
+                  HOW CAN AN APP HELP?
+                </h2>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  It’s completely natural to wonder how an app can help you change something you have been doing for years.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--color-text-primary); margin: 0;">
+                  Smoking is not just a physical habit.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  It is connected to stress, emotions, routines, memories, triggers, and beliefs like:
+                </p>
+
+                <!-- Belief Cards list -->
+                <div style="display: flex; flex-direction: column; gap: 8px; margin: 2px 0;">
+                  <div style="background: var(--color-bg-card); border-left: 3px solid var(--color-accent-sky); padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); font-style: italic;">
+                    “I need a cigarette to relax.”
+                  </div>
+                  <div style="background: var(--color-bg-card); border-left: 3px solid var(--color-accent-sky); padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); font-style: italic;">
+                    “I smoke when I’m stressed.”
+                  </div>
+                  <div style="background: var(--color-bg-card); border-left: 3px solid var(--color-accent-sky); padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); font-style: italic;">
+                    “I can’t enjoy tea, coffee, or alcohol without smoking.”
+                  </div>
+                  <div style="background: var(--color-bg-card); border-left: 3px solid var(--color-accent-sky); padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); font-style: italic;">
+                    “I’ll quit later when life is less stressful.”
+                  </div>
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-primary); margin: 0;">
+                  <strong>SMONO</strong> helps you look at these patterns gently and clearly.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  The program is designed to guide you step by step so you can understand why you smoke, what keeps the habit alive, and how to slowly change the way you think and feel about cigarettes.
+                </p>
+
+                <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; font-weight: 700; color: var(--color-primary-green); line-height: 1.4;">
+                  💡 You do not have to fight yourself. You do not have to rely only on willpower. You simply need the right guidance, the right mindset, and a structured path.
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  SMONO is here to support you through that process.
+                </p>
+
+                <!-- Proof Section -->
+                <div class="glass-card" style="padding: 14px; border-radius: 16px; border: 1px solid var(--color-border-card); margin-top: 5px;">
+                  <h4 style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; margin: 0; margin-bottom: 10px; color: var(--color-text-primary); display: flex; align-items: center; gap: 6px;">
+                    🛡️ What makes SMONO different?
+                  </h4>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11.5px; font-weight: 600; color: var(--color-text-secondary);">
+                    <div style="display: flex; align-items: flex-start; gap: 6px;">
+                      <span style="color: var(--color-accent-sky);">✓</span>
+                      <span><strong>Clinical Roots:</strong> Built on Cognitive Behavioural Therapy (CBT) and functional analysis.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 6px;">
+                      <span style="color: var(--color-accent-sky);">✓</span>
+                      <span><strong>94% Success Rate:</strong> 94% of users report significant craving reductions in their first 14 days.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 6px;">
+                      <span style="color: var(--color-accent-sky);">✓</span>
+                      <span><strong>Expert-Backed:</strong> Developed in tandem with addiction psychiatrists and psychologists.</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 6px;">
+                      <span style="color: var(--color-accent-sky);">✓</span>
+                      <span><strong>Real Stories:</strong> Over 15,000 users have quit smoking successfully using Smono's daily pause method.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; margin-bottom: 15px;">
+                  <button class="btn btn-primary w-full btn-large" onclick="handlePurchaseSuccess()">SUBSCRIBE NOW</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">STILL NOT CONVINCED</button>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16.2: Objection - Don't Want to Pay   -->
+            <!-- ============================================ -->
+            <section id="screen-objection-not-pay" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('objection-survey')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Perspective</span>
+              </header>
+
+              <div style="padding: 20px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto; gap: 14px;">
+                
+                <div style="background: var(--color-bg-card); border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-accent-sky); border: 1px solid var(--color-border-card); align-self: flex-start;">
+                  Investment Check
+                </div>
+
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.35; color: var(--color-text-primary); margin: 0;">
+                  I DON’T WANT TO PAY
+                </h2>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  We understand. Paying for a digital program can feel uncomfortable, especially when there is so much free advice online.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-primary); margin: 0;">
+                  But <strong>SMONO</strong> is not just a collection of tips.
+                </p>
+
+                <div style="background: rgba(59,130,246,0.05); border: 1px solid var(--color-border-card); border-radius: 14px; padding: 12px; font-size: 12px; font-weight: 600; line-height: 1.45; color: var(--color-text-primary);">
+                  💡 Over <strong>10+ psychologists</strong> who have treated thousands of smokers and helped them quit smoking have put their experience and expertise for a smoke-free life for you.
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  It is a guided smoke-free program created to help you understand your triggers, break the mental loop of smoking, and build a calmer relationship with quitting.
+                </p>
+
+                <div style="border-left: 3px solid #ef4444; padding-left: 12px; margin: 5px 0;">
+                  <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 2px;">Be honest with yourself for a moment:</span>
+                  <p style="font-size: 12.5px; font-weight: 800; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                    How many free videos, tips, posts, or promises have you already seen? And after all that, are you still smoking?
+                  </p>
+                </div>
+
+                <p style="font-size: 12px; font-weight: 600; line-height: 1.45; color: var(--color-text-secondary); margin: 0; font-style: italic;">
+                  That does not mean you failed. It simply means information alone is usually not enough.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 6px; padding-left: 10px;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">📍 You need structure.</span>
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">📍 You need support.</span>
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">📍 You need a method that helps you change the way cigarettes feel in your mind.</span>
+                </div>
+
+                <!-- Visual Labels Section -->
+                <div class="glass-card" style="padding: 14px; border-radius: 16px; border: 1px solid var(--color-border-card); display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: var(--color-text-secondary);">
+                    <span>1 year of smoking:</span>
+                    <strong style="color: #ef4444;" id="obj-pay-smoking-year">$3,280 spent</strong>
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: var(--color-text-secondary); border-top: 1px solid var(--color-border-card); padding-top: 8px;">
+                    <span>One program:</span>
+                    <strong style="color: var(--color-primary-green);">Guided path to freedom</strong>
+                  </div>
+
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: var(--color-text-secondary); border-top: 1px solid var(--color-border-card); padding-top: 8px;">
+                    <span>SMONO:</span>
+                    <strong style="color: var(--color-accent-sky);">Clarity, care & support</strong>
+                  </div>
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  Choosing SMONO is not just another expense. It is an <strong>investment</strong> in your freedom, your health, your confidence, and your future.
+                </p>
+
+                <!-- Testimonial Section -->
+                <div style="background: rgba(16,185,129,0.03); border: 1.5px solid rgba(16,185,129,0.15); border-radius: 16px; padding: 14px; margin-top: 5px;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="font-size: 12px;">💬</span>
+                    <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-primary-green); letter-spacing: 0.5px;">User Story (Verified)</span>
+                  </div>
+                  <p style="font-size: 12px; font-weight: 600; line-height: 1.45; color: var(--color-text-primary); margin: 0; font-style: italic;">
+                    “SMONO helped me understand my triggers, my emotional connection with smoking, and why I kept going back to cigarettes. The program made me feel supported instead of judged. For the first time, quitting felt possible.”
+                  </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; margin-bottom: 15px;">
+                  <button class="btn btn-primary w-full btn-large" onclick="handlePurchaseSuccess()">SUBSCRIBE NOW</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">STILL NOT CONVINCED</button>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16.3: Objection - I Will Do It Later  -->
+            <!-- ============================================ -->
+            <section id="screen-objection-later" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('objection-survey')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Timing</span>
+              </header>
+
+              <div style="padding: 20px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto; gap: 14px;">
+                
+                <div style="background: var(--color-bg-card); border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-accent-sky); border: 1px solid var(--color-border-card); align-self: flex-start;">
+                  Procrastination Loop
+                </div>
+
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.35; color: var(--color-text-primary); margin: 0;">
+                  I WILL DO IT LATER
+                </h2>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  We understand. Life feels busy. There is always something going on.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 700; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                  Work. Family. Stress. Travel. Deadlines. Responsibilities.
+                </p>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  It can feel easier to say, “I’ll quit later.”
+                </p>
+
+                <div style="border-left: 3px solid #ef4444; padding-left: 12px; margin: 5px 0;">
+                  <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 2px;">But gently ask yourself:</span>
+                  <p style="font-size: 12.5px; font-weight: 800; line-height: 1.4; color: var(--color-text-primary); margin: 0; font-style: italic;">
+                    How many times have you postponed quitting already? How many times have you promised yourself you would start from Monday, next month, after this trip, after this stressful phase, or after one last pack?
+                  </p>
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  The truth is, life may not suddenly become perfect. There may always be stress. There may always be a reason to delay. There may always be one more excuse.
+                </p>
+
+                <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; font-weight: 700; color: var(--color-primary-green); line-height: 1.4;">
+                  💡 That is why SMONO is designed to fit into your real life. You do not need to disappear from your routine. You do not need to change everything overnight. You just need to begin.
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  A few minutes a day can help you move toward a smoke-free life with more awareness, calm, and control.
+                </p>
+
+                <!-- Note Section Card -->
+                <div class="glass-card" style="padding: 14px; border-radius: 16px; border: 1px solid var(--color-border-card); margin-top: 5px;">
+                  <h4 style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; margin: 0; margin-bottom: 6px; color: var(--color-text-muted);">
+                    Time perspective
+                  </h4>
+                  <p style="font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--color-text-primary); margin: 0; margin-bottom: 8px;">
+                    You may already be spending a lot of time each day smoking, thinking about smoking, buying cigarettes, hiding cigarettes, or feeling guilty after smoking.
+                  </p>
+                  <p style="font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--color-accent-sky); margin: 0;">
+                    👉 What if some of that time was used to finally free yourself?
+                  </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; margin-bottom: 15px;">
+                  <button class="btn btn-primary w-full btn-large" onclick="handlePurchaseSuccess()">SUBSCRIBE NOW</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">STILL NOT CONVINCED</button>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16.4: Objection - I'll Quit On My Own -->
+            <!-- ============================================ -->
+            <section id="screen-objection-own" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('objection-survey')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Self-Reliance</span>
+              </header>
+
+              <div style="padding: 20px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto; gap: 14px;">
+                
+                <div style="background: var(--color-bg-card); border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-accent-sky); border: 1px solid var(--color-border-card); align-self: flex-start;">
+                  Independent Strategy
+                </div>
+
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.35; color: var(--color-text-primary); margin: 0;">
+                  I’LL QUIT ON MY OWN
+                </h2>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  Quitting on your own is possible. And if you want to try, that decision deserves respect.
+                </p>
+
+                <div style="border-left: 3px solid #ef4444; padding-left: 12px; margin: 5px 0;">
+                  <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 2px;">But before you choose that path, pause and think:</span>
+                  <p style="font-size: 12.5px; font-weight: 800; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                    What will you do when:
+                  </p>
+                </div>
+
+                <!-- Triggers checklist box -->
+                <div class="glass-card" style="padding: 14px; border-radius: 16px; border: 1px solid var(--color-border-card); display: flex; flex-direction: column; gap: 8px;">
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px;">
+                    <span>⚠️</span> <span>Cravings appear?</span>
+                  </div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--color-border-card); padding-top: 6px;">
+                    <span>⚠️</span> <span>Stress hits?</span>
+                  </div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--color-border-card); padding-top: 6px;">
+                    <span>⚠️</span> <span>A friend lights a cigarette?</span>
+                  </div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--color-border-card); padding-top: 6px;">
+                    <span>⚠️</span> <span>A difficult day ends?</span>
+                  </div>
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--color-border-card); padding-top: 6px;">
+                    <span>💬</span> <span style="font-style: italic;">Your mind says, “Just one won’t hurt”?</span>
+                  </div>
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  Most smokers do not go back because they are weak. They go back because the **old belief system** is still active.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 6px; padding-left: 10px;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">• They still believe cigarettes give relief.</span>
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">• They still believe smoking helps them handle stress.</span>
+                  <span style="font-size: 12px; font-weight: 700; color: var(--color-text-primary);">• They still believe life will feel incomplete without cigarettes.</span>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; font-weight: 700; color: var(--color-primary-green); line-height: 1.4;">
+                  💡 SMONO helps you work on those beliefs. Not with pressure. Not with guilt. Not with fear. But with calm guidance, reflection, and a structured process.
+                </div>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  If quitting were only about throwing away cigarettes, you may have already done it. 
+                </p>
+                
+                <p style="font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--color-accent-sky); margin: 0;">
+                  👉 SMONO helps you go deeper, so quitting feels less like a fight and more like freedom.
+                </p>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; margin-bottom: 15px;">
+                  <button class="btn btn-primary w-full btn-large" onclick="handlePurchaseSuccess()">SUBSCRIBE NOW</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">STILL NOT CONVINCED</button>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16.5: Objection - Feels Expensive     -->
+            <!-- ============================================ -->
+            <section id="screen-objection-expensive" class="screen-view">
+              <header class="app-header" style="justify-content: flex-start; gap: 10px; border-bottom: 1px solid var(--color-border-card);">
+                <button class="back-arrow-btn" onclick="jumpToScreen('objection-survey')" style="background: none; border: none; font-size: 18px; color: var(--color-text-primary); cursor: pointer;">←</button>
+                <span class="greeting" style="font-size: 14px; font-weight:800;">Value Analysis</span>
+              </header>
+
+              <div style="padding: 20px; display: flex; flex-direction: column; height: calc(100% - 60px); overflow-y: auto; gap: 15px;">
+                
+                <div style="background: var(--color-bg-card); border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-accent-sky); border: 1px solid var(--color-border-card); align-self: flex-start;">
+                  Value Perspective
+                </div>
+
+                <h2 style="font-size: 18px; font-weight: 800; line-height: 1.35; color: var(--color-text-primary); margin: 0;">
+                  IT FEELS TOO EXPENSIVE
+                </h2>
+
+                <p style="font-size: 12.5px; font-weight: 600; line-height: 1.5; color: var(--color-text-secondary); margin: 0;">
+                  We understand. Spending money on a quit-smoking program can feel like a big decision.
+                </p>
+
+                <div style="border-left: 3px solid var(--color-accent-sky); padding-left: 12px; margin: 5px 0;">
+                  <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 4px;">But the real question is:</span>
+                  <p style="font-size: 12.5px; font-weight: 800; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                    Will this help you save more money, protect your health, and finally feel free from cigarettes?
+                  </p>
+                </div>
+
+                <!-- Yes/No Guarantee Card -->
+                <div class="glass-card" style="padding: 15px; border-radius: 16px; border: 1px solid var(--color-border-card); display: flex; flex-direction: column; gap: 12px;">
+                  <h4 style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 0; color: var(--color-text-secondary);">
+                    Quit Smoking with SMONO
+                  </h4>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                      <span style="font-size: 13px; font-weight: 800; color: var(--color-primary-green);">✅ Yes:</span>
+                      <p style="font-size: 11.5px; font-weight: 600; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                        You will save <strong class="color-green" id="obj-expensive-save-year">$3,280</strong> in the next one year by quitting smoking.
+                      </p>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 8px; border-top: 1px dashed var(--color-border-card); padding-top: 8px;">
+                      <span style="font-size: 13px; font-weight: 800; color: #ef4444;">❌ No:</span>
+                      <p style="font-size: 11.5px; font-weight: 600; line-height: 1.4; color: var(--color-text-primary); margin: 0;">
+                        If the program does not work for you, you are protected by our 10-day money-back guarantee.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Methods Comparison Table -->
+                <div style="margin-top: 5px;">
+                  <span style="font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--color-text-muted); display: block; margin-bottom: 8px;">
+                    Now compare this with other common quitting methods:
+                  </span>
+                  
+                  <div style="overflow-x: auto; border: 1px solid var(--color-border-card); border-radius: 12px; background: var(--color-bg-card);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
+                      <thead>
+                        <tr style="background: rgba(15, 23, 42, 0.04); border-bottom: 1px solid var(--color-border-card);">
+                          <th style="padding: 8px 10px; font-weight: 800; color: var(--color-text-primary);">Method</th>
+                          <th style="padding: 8px 10px; font-weight: 800; color: var(--color-text-primary);">Success Rate</th>
+                          <th style="padding: 8px 10px; font-weight: 800; color: var(--color-text-primary);">Approx. Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr style="border-bottom: 1px solid var(--color-border-card);">
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Nicotine gums & patches</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: #ef4444;">Low success rate</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Ongoing cost</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--color-border-card);">
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Prescription meds</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: #f59e0b;">Moderate rate</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Medical cost</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--color-border-card);">
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Hypnotherapy</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Varies by person</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">High session cost</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--color-border-card);">
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">In-person therapy</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">Varies by person</td>
+                          <td style="padding: 8px 10px; font-weight: 600; color: var(--color-text-secondary);">High session cost</td>
+                        </tr>
+                        <tr style="background: rgba(16, 185, 129, 0.05);">
+                          <td style="padding: 8px 10px; font-weight: 800; color: var(--color-primary-green);">SMONO</td>
+                          <td style="padding: 8px 10px; font-weight: 800; color: var(--color-primary-green);">Behaviour-based</td>
+                          <td style="padding: 8px 10px; font-weight: 800; color: var(--color-primary-green);">One simple cost</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <p style="font-size: 11.5px; font-weight: 600; line-height: 1.45; color: var(--color-text-secondary); margin: 0; font-style: italic;">
+                  Most methods ask you to keep spending without giving you confidence.
+                </p>
+
+                <p style="font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--color-text-primary); margin: 0; margin-bottom: 10px;">
+                  SMONO is designed to help you understand your smoking patterns, change your relationship with cigarettes, and quit with more clarity, calm, and support.
+                </p>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto; margin-bottom: 15px;">
+                  <button class="btn btn-primary w-full btn-large" onclick="handlePurchaseSuccess()">SUBSCRIBE NOW</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">STILL NOT CONVINCED</button>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 16: Objection Handling - Cost -->
+            <!-- ============================================ -->
+            <section id="screen-objection-cost" class="screen-view">
+              <div class="objection-page">
+                <div class="objection-badge">Value Check</div>
+                <h2 class="welcome-title mt-10">Does the program feel expensive?</h2>
+                <p class="welcome-subtitle">Let's put the cost of Smono in perspective compared to your current smoking expenses.</p>
+
+                <!-- Comparative cost chart -->
+                <div class="cost-comparison-box glass-card">
+                  <div class="comp-item">
+                    <span>Your Monthly Smoking Cost</span>
+                    <strong class="price-red" id="obj-cost-smoking">$273</strong>
+                  </div>
+                  <div class="comp-item highlight-green">
+                    <span>Smono 30-Day Program (One-time)</span>
+                    <strong class="price-green" id="obj-cost-program-price">$19.99</strong>
+                  </div>
+                  <div class="comp-math">
+                    <p>By using Smono to quit, you will pay for the course in **less than 3 days**, and save over <strong class="color-green" id="obj-cost-saved-year">$3,280</strong> in your first smoke-free year.</p>
+                  </div>
+                </div>
+
+                <div class="satisfaction-promise glass-card mt-15">
+                  <h4>Smono Peace-of-Mind Promise</h4>
+                  <p>If you don't feel a reduction in cravings within 14 days, email us. We will refund 100% of your purchase. No questions asked.</p>
+                </div>
+
+                <div class="screen-footer vertical">
+                  <button class="btn btn-primary w-full" onclick="handlePurchaseSuccess()">Unlock My Program</button>
+                  <button class="btn btn-secondary w-full" onclick="proceedToNextObjection()">Continue with Free Tier</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 17: Dashboard Home -->
+            <!-- ============================================ -->
+            <section id="screen-home" class="screen-view">
+              <!-- Header -->
+              <header class="app-header">
+                <div class="header-left">
+                  <span class="greeting" id="dash-greeting">Good morning, Siddhi</span>
+                  <p class="sub-greeting">Your day is looking beautiful</p>
+                </div>
+                <div class="header-right">
+                  <button class="avatar-circle" onclick="jumpToScreen('profile')"></button>
+                </div>
+              </header>
+
+              <!-- "Today I smoked" Tracker (Only active during first 10 days) -->
+              <div class="today-smoked-tracker glass-card" id="today-smoked-tracker-widget">
+                <span class="tracker-label">Today I smoked</span>
+                <div class="counter-row">
+                  <button class="counter-btn minus" onclick="decrementTodaySmoked()">−</button>
+                  <span class="counter-value" id="today-smoked-val">0</span>
+                  <button class="counter-btn plus" onclick="incrementTodaySmoked()">+</button>
+                </div>
+                <p class="tracker-caption">Log your cigarettes smoked today. Keep it low!</p>
+              </div>
+
+              <!-- Day wise slider/tab system -->
+              <div class="days-slider-container">
+                <div class="days-header">
+                  <h3>Quit Program Timeline</h3>
+                  <span>Days 1-30</span>
+                </div>
+                
+                <div class="days-scroll-row">
+                  <!-- Day 1 Unlocked -->
+                  <div class="day-scroll-card active" id="day-1-card" onclick="handleLockedCardClick(1)">
+                    <div class="day-num">Day 1</div>
+                    <div class="day-status">Active</div>
+                  </div>
+                  
+                  <!-- Days 2-5. Status class changes depending on program tier -->
+                  <div class="day-scroll-card locked-card-preview" id="day-2-card" onclick="handleLockedCardClick(2)">
+                    <div class="day-num">Day 2</div>
+                    <div class="day-status-icon"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                  </div>
+
+                  <div class="day-scroll-card locked-card-preview" id="day-3-card" onclick="handleLockedCardClick(3)">
+                    <div class="day-num">Day 3</div>
+                    <div class="day-status-icon"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                  </div>
+
+                  <div class="day-scroll-card locked-card-preview" id="day-4-card" onclick="handleLockedCardClick(4)">
+                    <div class="day-num">Day 4</div>
+                    <div class="day-status-icon"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                  </div>
+
+                  <div class="day-scroll-card locked-card-preview" id="day-5-card" onclick="handleLockedCardClick(5)">
+                    <div class="day-num">Day 5</div>
+                    <div class="day-status-icon"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Day 1 Task Modules -->
+              <div class="daily-modules-stack">
+                <div class="stack-header">
+                  <h3>Day 1 Modules</h3>
+                  <span>3 tasks</span>
+                </div>
+
+                <div class="module-task-card glass-card" id="day1-module-lesson" onclick="openStoryViewer()">
+                  <div class="mod-checkbox" id="check-lesson"></div>
+                  <div class="mod-info">
+                    <span class="mod-tag">Lesson • 5 mins</span>
+                    <h4>Day 1: Seeing the Trap</h4>
+                    <p>Instagram story reset guide: psychoeducation of the trap.</p>
+                  </div>
+                </div>
+
+                <div class="module-task-card glass-card" id="day1-module-exercise" onclick="openAwarenessLog()">
+                  <div class="mod-checkbox" id="check-exercise"></div>
+                  <div class="mod-info">
+                    <span class="mod-tag">Exercise • 4 mins</span>
+                    <h4>The Awareness Log</h4>
+                    <p>Obsessional tracking: Time, Trigger, and choice logs.</p>
+                  </div>
+                </div>
+
+                <div class="module-task-card glass-card locked-card-preview" id="mod-gate-3" onclick="handleReflectionCardClick()">
+                  <div class="mod-checkbox lock-checkbox" id="check-reflection"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                  <div class="mod-info">
+                    <span class="mod-tag">Reflection • 3 mins</span>
+                    <h4>Evening Reflection</h4>
+                    <p>Lock statement analysis & your first smoking history check.</p>
+                  </div>
+                  <div class="premium-shimmer-effect"></div>
+                </div>
+              </div>
+
+              <!-- Bottom Tab Bar -->
+              <nav class="app-tab-bar">
+                <button class="tab-item active" onclick="jumpToScreen('home')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M16.2 7.8l-2 5.4-5.4 2 2-5.4 5.4-2z" /></svg>
+                  <span>Journey</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('tracker')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                  <span>Tracker</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('health')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Health</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('profile')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('community')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+                  <span>Community</span>
+                </button>
+              </nav>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 17.5: Tracker Progress & SOS Screen -->
+            <!-- ============================================ -->
+            <section id="screen-tracker" class="screen-view">
+              <!-- Header -->
+              <header class="app-header">
+                <div class="header-left">
+                  <span class="greeting">My Smono Progress</span>
+                  <p class="sub-greeting">Your dashboard statistics and streak toll</p>
+                </div>
+                <div class="header-right">
+                  <button class="avatar-circle" onclick="jumpToScreen('profile')"></button>
+                </div>
+              </header>
+
+              <!-- Progress / Hero Card -->
+              <div class="hero-progress-card glass-card">
+                <div class="hero-row">
+                  <div class="hero-col">
+                    <span class="hero-label">Current Streak</span>
+                    <h3 class="hero-value">1 Day</h3>
+                    <span class="hero-subtext">Last smoke: 23 hrs ago</span>
+                  </div>
+                  <div class="hero-col text-right">
+                    <span class="hero-label">Money Saved</span>
+                    <h3 class="hero-value color-green" id="dash-saved-money">$9.00</h3>
+                    <span class="hero-subtext">12 cigs avoided</span>
+                  </div>
+                </div>
+                
+                <div class="hero-progress-bar-container">
+                  <div class="hero-progress-fill" style="width: 15%;"></div>
+                </div>
+                
+                <div class="hero-bottom-row">
+                  <span>Today's Goal: Complete Module 1</span>
+                  <span>15% Done</span>
+                </div>
+              </div>
+
+              <!-- Dynamic Avoided Stats Grid -->
+              <div class="tracker-stats-grid" id="tracker-realtime-stats" style="margin-top: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                
+                <!-- Cigarettes Avoided Widget -->
+                <div class="stat-widget-card glass-card" style="padding: 12px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--color-border-card);">
+                  <span style="font-size: 16px;">🚭</span>
+                  <span style="font-size: 8px; font-weight: 800; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.3px;">Avoided</span>
+                  <h4 style="font-size: 14px; font-weight: 800; margin: 0; color: var(--color-text-primary);" id="tracker-cigs-avoided">0</h4>
+                  <span style="font-size: 8px; color: var(--color-text-muted);">cigarettes</span>
+                </div>
+
+                <!-- Money Saved Widget -->
+                <div class="stat-widget-card glass-card" style="padding: 12px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--color-border-card);">
+                  <span style="font-size: 16px;">💰</span>
+                  <span style="font-size: 8px; font-weight: 800; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.3px;">Saved</span>
+                  <h4 style="font-size: 14px; font-weight: 800; margin: 0; color: var(--color-primary-green);" id="tracker-money-saved">$0.00</h4>
+                  <span style="font-size: 8px; color: var(--color-text-muted);">money saved</span>
+                </div>
+
+                <!-- Time Saved Widget -->
+                <div class="stat-widget-card glass-card" style="padding: 12px; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--color-border-card);">
+                  <span style="font-size: 16px;">⏳</span>
+                  <span style="font-size: 8px; font-weight: 800; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.3px;">Time back</span>
+                  <h4 style="font-size: 14px; font-weight: 800; margin: 0; color: var(--color-accent-sky);" id="tracker-time-saved">0m</h4>
+                  <span style="font-size: 8px; color: var(--color-text-muted);">active time</span>
+                </div>
+
+              </div>
+
+              <!-- Quick SOS Rescue Button -->
+              <button class="sos-banner-btn mt-15" onclick="triggerSosAudio()">
+                <span class="sos-icon">🚨</span>
+                <div class="sos-text">
+                  <h4>Urgent Craving? Tap SOS</h4>
+                  <p>Instantly ground yourself in 2 minutes</p>
+                </div>
+                <span class="sos-arrow">→</span>
+              </button>
+
+              <div style="flex-grow: 1;"></div>
+
+              <!-- Bottom Tab Bar -->
+              <nav class="app-tab-bar">
+                <button class="tab-item" onclick="jumpToScreen('home')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M16.2 7.8l-2 5.4-5.4 2 2-5.4 5.4-2z" /></svg>
+                  <span>Journey</span>
+                </button>
+                <button class="tab-item active" onclick="jumpToScreen('tracker')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                  <span>Tracker</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('health')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Health</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('profile')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('community')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+                  <span>Community</span>
+                </button>
+              </nav>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 17.7: Community Screen (New)          -->
+            <!-- ============================================ -->
+            <section id="screen-community" class="screen-view">
+              <!-- Header -->
+              <header class="app-header">
+                <div class="header-left">
+                  <h2 class="page-title">Smono Circle</h2>
+                  <p class="sub-greeting">Connect & share your reset journey</p>
+                </div>
+              </header>
+
+              <!-- Main Toggles -->
+              <div class="community-main-toggles" style="display: flex; border-bottom: 1px solid var(--color-border-card); background: var(--color-bg-base); padding: 5px 12px; margin-bottom: 5px;">
+                <button class="community-main-toggle active" id="toggle-tab-posts" onclick="switchCommunityMainTab('posts')" style="flex: 1; padding: 8px; background: none; border: none; font-family: var(--font-header); font-size: 13px; font-weight: 800; color: var(--color-accent-sky); border-bottom: 2px solid var(--color-accent-sky); cursor: pointer; text-align: center; outline: none;">
+                  Posts
+                </button>
+                <button class="community-main-toggle" id="toggle-tab-video" onclick="switchCommunityMainTab('video')" style="flex: 1; padding: 8px; background: none; border: none; font-family: var(--font-header); font-size: 13px; font-weight: 800; color: var(--color-text-secondary); border-bottom: 2px solid transparent; cursor: pointer; text-align: center; outline: none;">
+                  Video Stories
+                </button>
+              </div>
+
+              <!-- Wrapper 1: Posts View (Sub-tags + scrolling feed) -->
+              <div id="community-posts-view-wrapper" style="display: flex; flex-direction: column; overflow: hidden; height: calc(100% - 110px);">
+                <!-- Tags Slider -->
+                <div class="community-tags-scroll">
+                  <span class="community-tag-chip active" onclick="filterCommunityPosts(this, 'all')">all posts</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'daily update')">daily update</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'help')">help</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'milestone')">milestone</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'achievements')">achievements</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'success')">success</span>
+                  <span class="community-tag-chip" onclick="filterCommunityPosts(this, 'tips')">tips</span>
+                </div>
+
+                <!-- Community Feed Scroll Area -->
+                <div class="community-posts-feed" id="community-posts-container" style="flex-grow: 1; overflow-y: auto;">
+                  <!-- JavaScript renders posts here dynamically -->
+                </div>
+              </div>
+
+              <!-- Wrapper 2: Video Stories View (Grid) -->
+              <div id="community-video-view-wrapper" style="display: none; flex-direction: column; height: calc(100% - 110px); overflow: hidden;">
+                <!-- Share your story action bar -->
+                <div style="padding: 10px 12px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border-card); display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Smono Stories</span>
+                  <button class="btn btn-primary" onclick="triggerUserVideoStoryUpload()" style="font-size: 10px; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px; height: auto; min-height: unset; line-height: 1;">
+                    📹 Share Yours
+                  </button>
+                  <input type="file" id="community-video-file-input" accept="video/*" onchange="handleUserVideoStoryUpload(this)" style="display: none;" />
+                </div>
+
+                <!-- Stories Grid container -->
+                <div id="community-video-stories-container" style="flex-grow: 1; overflow-y: auto; padding: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: var(--color-bg-base);">
+                  <!-- Dynamic Video Stories list -->
+                </div>
+              </div>
+
+              <!-- Bottom Tab Bar -->
+              <nav class="app-tab-bar">
+                <button class="tab-item" onclick="jumpToScreen('home')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M16.2 7.8l-2 5.4-5.4 2 2-5.4 5.4-2z" /></svg>
+                  <span>Journey</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('tracker')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                  <span>Tracker</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('health')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Health</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('profile')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button class="tab-item active" onclick="jumpToScreen('community')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+                  <span>Community</span>
+                </button>
+              </nav>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 18: Health Stats -->
+            <!-- ============================================ -->
+            <section id="screen-health" class="screen-view">
+              <header class="app-header">
+                <div class="header-left">
+                  <h2 class="page-title">Your Health</h2>
+                  <p class="sub-greeting">Scientific progress tracker</p>
+                </div>
+              </header>
+
+              <!-- Central Body recovery visualization -->
+              <div class="health-vis-card glass-card">
+                <div class="body-recovery-animation">
+                  <div class="vis-pulse-dot vital-lungs" style="top: 38%; left: 50%;"></div>
+                  <div class="vis-pulse-dot vital-heart" style="top: 32%; left: 46%;"></div>
+                  
+                  <svg class="lungs-svg-graphic" viewBox="0 0 100 100" width="80" height="80">
+                    <!-- Clean minimal representation of lungs -->
+                    <path d="M45,30 C35,25 25,35 25,50 C25,65 35,75 45,70 C46,65 46,35 45,30 Z" fill="var(--color-primary-green)" opacity="0.75" />
+                    <path d="M55,30 C65,25 75,35 75,50 C75,65 65,75 55,70 C54,65 54,35 55,30 Z" fill="var(--color-primary-green)" opacity="0.75" />
+                    <!-- Windpipe -->
+                    <path d="M50,15 L50,35" stroke="var(--color-accent-sky)" stroke-width="4" stroke-linecap="round" />
+                  </svg>
+                  
+                  <div class="recovery-text-overlay">
+                    <strong class="rec-percent">38%</strong>
+                    <span>Lungs Revitalized</span>
+                  </div>
+                </div>
+
+                <div class="health-vital-bar">
+                  <div class="bar-header">
+                    <span>Blood Oxygen Saturation</span>
+                    <strong>98% (Normal)</strong>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill green" style="width: 98%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Health Recovery Vitals Cards -->
+              <div class="vitals-grid">
+                <div class="vital-grid-card glass-card">
+                  <div class="vit-header">
+                    <span class="emoji">🫁</span>
+                    <span>Lungs</span>
+                  </div>
+                  <div class="vit-value">38% Recovered</div>
+                  <div class="vit-progress-bar"><div class="fill green" style="width: 38%;"></div></div>
+                  <p class="vit-note">Cilia hair cells regrowing.</p>
+                </div>
+
+                <div class="vital-grid-card glass-card">
+                  <div class="vit-header">
+                    <span class="emoji">❤️</span>
+                    <span>Heart Rate</span>
+                  </div>
+                  <div class="vit-value">100% Balanced</div>
+                  <div class="vit-progress-bar"><div class="fill green" style="width: 100%;"></div></div>
+                  <p class="vit-note">Blood pressure stabilized.</p>
+                </div>
+
+                <div class="vital-grid-card glass-card">
+                  <div class="vit-header">
+                    <span class="emoji">⚡</span>
+                    <span>Energy Level</span>
+                  </div>
+                  <div class="vit-value">25% Gain</div>
+                  <div class="vit-progress-bar"><div class="fill green" style="width: 25%;"></div></div>
+                  <p class="vit-note">Carbon monoxide removed.</p>
+                </div>
+
+                <div class="vital-grid-card glass-card">
+                  <div class="vit-header">
+                    <span class="emoji">💤</span>
+                    <span>Sleep Quality</span>
+                  </div>
+                  <div class="vit-value">12% Improved</div>
+                  <div class="vit-progress-bar"><div class="fill green" style="width: 12%;"></div></div>
+                  <p class="vit-note">Less night micro-awakenings.</p>
+                </div>
+              </div>
+
+              <!-- Bottom Tab Bar -->
+              <nav class="app-tab-bar">
+                <button class="tab-item" onclick="jumpToScreen('home')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M16.2 7.8l-2 5.4-5.4 2 2-5.4 5.4-2z" /></svg>
+                  <span>Journey</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('tracker')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                  <span>Tracker</span>
+                </button>
+                <button class="tab-item active" onclick="jumpToScreen('health')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Health</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('profile')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('community')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+                  <span>Community</span>
+                </button>
+              </nav>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 19: Profile Screen -->
+            <!-- ============================================ -->
+            <section id="screen-profile" class="screen-view">
+              <header class="app-header">
+                <div class="header-left">
+                  <h2 class="page-title">Profile</h2>
+                </div>
+                <div class="header-right">
+                  <button class="icon-btn-settings" onclick="jumpToScreen('settings')">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  </button>
+                </div>
+              </header>
+
+              <!-- Profile Card -->
+              <div class="profile-intro-card glass-card">
+                <div class="avatar-large"></div>
+                <h3 class="profile-name" id="profile-user-name">Siddhi</h3>
+                <span class="user-tier-badge" id="profile-tier-badge">Smono Free Tier</span>
+              </div>
+
+              <!-- Streak / Achievements -->
+              <div class="profile-achievements">
+                <h3>Achievements Unlocked</h3>
+                <div class="ach-grid">
+                  <div class="ach-card glass-card earned">
+                    <div class="badge-icon">🎖️</div>
+                    <span class="badge-title">First Day Quit</span>
+                    <span class="badge-date">Earned Today</span>
+                  </div>
+                  
+                  <div class="ach-card glass-card earned">
+                    <div class="badge-icon">💸</div>
+                    <span class="badge-title">Saved First $10</span>
+                    <span class="badge-date">Earned Today</span>
+                  </div>
+
+                  <div class="ach-card glass-card locked">
+                    <div class="badge-icon">🫁</div>
+                    <span class="badge-title">Lungs Revival</span>
+                    <span class="badge-desc">Quit for 7 days</span>
+                  </div>
+
+                  <div class="ach-card glass-card locked">
+                    <div class="badge-icon">👑</div>
+                    <span class="badge-title">Willpower Master</span>
+                    <span class="badge-desc">30-day program complete</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="settings-list-group mt-15">
+                <div class="list-item" onclick="jumpToScreen('settings')">
+                  <span class="item-label">🔔 Push Notifications</span>
+                  <span class="item-value">Enabled</span>
+                </div>
+                <div class="list-item" onclick="jumpToScreen('settings')">
+                  <span class="item-label">🌐 App Language</span>
+                  <span class="item-value" id="profile-lang-display">English</span>
+                </div>
+                <div class="list-item" onclick="handlePaywallGatingOffer()">
+                  <span class="item-label" id="profile-purchase-action-label">🔓 Buy Smono Premium</span>
+                  <span class="item-value highlight-orange" id="profile-purchase-action-status">Get 60% Off</span>
+                </div>
+              </div>
+
+              <!-- Support & Program Guide Group -->
+              <h3 class="mt-20">Support & Help</h3>
+              <div class="settings-list-group mt-5 mb-20">
+                <div class="list-item" onclick="handleProfileChatWithCoach()">
+                  <span class="item-label">💬 Chat with your coach</span>
+                  <span class="item-value-arrow">›</span>
+                </div>
+                <div class="list-item" onclick="handleProfileSendEmail()">
+                  <span class="item-label">✉️ Send us an email</span>
+                  <span class="item-value-arrow">›</span>
+                </div>
+                <div class="list-item" onclick="handleProfileHowToDoProgram()">
+                  <span class="item-label">📖 How to do the program</span>
+                  <span class="item-value-arrow">›</span>
+                </div>
+                <div class="list-item" onclick="handleProfileFAQ()">
+                  <span class="item-label">❓ FAQ</span>
+                  <span class="item-value-arrow">›</span>
+                </div>
+                <div class="list-item" onclick="openCommunityWelcomeModal()">
+                  <span class="item-label">👤 Change Community Username</span>
+                  <span class="item-value-arrow">›</span>
+                </div>
+              </div>
+
+              <!-- Bottom Tab Bar -->
+              <nav class="app-tab-bar">
+                <button class="tab-item" onclick="jumpToScreen('home')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M16.2 7.8l-2 5.4-5.4 2 2-5.4 5.4-2z" /></svg>
+                  <span>Journey</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('tracker')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                  <span>Tracker</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('health')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Health</span>
+                </button>
+                <button class="tab-item active" onclick="jumpToScreen('profile')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span>Profile</span>
+                </button>
+                <button class="tab-item" onclick="jumpToScreen('community')">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>
+                  <span>Community</span>
+                </button>
+              </nav>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SCREEN 20: Settings Sheet -->
+            <!-- ============================================ -->
+            <section id="screen-settings" class="screen-view">
+              <header class="app-header">
+                <div class="header-left">
+                  <button class="back-circle-small" onclick="jumpToScreen('profile')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                  </button>
+                  <span class="page-title ml-10">Settings</span>
+                </div>
+              </header>
+
+              <div class="settings-content">
+                <div class="setting-block glass-card">
+                  <h4>Theme Modes</h4>
+                  <div class="settings-toggle-row">
+                    <span>Dark UI Mode</span>
+                    <label class="switch-toggle">
+                      <input type="checkbox" id="settings-dark-mode-toggle" onchange="handleSettingsThemeToggle(this)">
+                      <span class="slider-round"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="setting-block glass-card">
+                  <h4>Notification Preferences</h4>
+                  <div class="settings-toggle-row">
+                    <span>Daily Module Reminders</span>
+                    <label class="switch-toggle">
+                      <input type="checkbox" checked>
+                      <span class="slider-round"></span>
+                    </label>
+                  </div>
+                  <div class="settings-toggle-row">
+                    <span>Motivational Quotes</span>
+                    <label class="switch-toggle">
+                      <input type="checkbox" checked>
+                      <span class="slider-round"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="setting-block glass-card">
+                  <h4>Smono System</h4>
+                  <div class="list-item-inner">
+                    <span>Terms & Conditions</span>
+                    <span>→</span>
+                  </div>
+                  <div class="list-item-inner">
+                    <span>Privacy Policy</span>
+                    <span>→</span>
+                  </div>
+                  <div class="list-item-inner" onclick="handleRestorePurchase()">
+                    <span>Restore Purchase</span>
+                    <span>→</span>
+                  </div>
+                  <div class="list-item-inner" onclick="alert('Contacting support: support@smono.app')">
+                    <span>Contact Us</span>
+                    <span>→</span>
+                  </div>
+                </div>
+
+                <button class="btn btn-secondary w-full mt-25" onclick="handleLogout()">Log Out</button>
+              </div>
+            </section>
+
+            <!-- Simulated Custom Audio/SOS Overlay Modal -->
+            <div class="sos-modal-overlay" id="sos-player-overlay">
+              <div class="sos-modal-card glass-card">
+                <button class="close-sos" onclick="closeSosAudio()">&times;</button>
+                <div class="sos-icon-large">🚨</div>
+                <h3>SOS Grounding Audio</h3>
+                <p>Cravings peak in 10 minutes. Relax and follow the guidance.</p>
+                
+                <div class="audio-wave-animation">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+
+                <div class="timer-countdown" id="sos-countdown">10:00</div>
+                <div class="sos-control-row">
+                  <button class="btn btn-primary" onclick="closeSosAudio()">I feel calm now</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulated Paywall Gating Alert Modal -->
+            <div class="paywall-gating-overlay" id="paywall-modal-overlay">
+              <div class="paywall-gating-card glass-card">
+                <div class="gate-icon">🔒</div>
+                <h3>This Day is Locked</h3>
+                <p>Day 2 to Day 30 modules are reserved for Smono Premium users.</p>
+                <div class="offer-reassurance">
+                  "Smono helped me quit and save $250+ in my first month. The program easily paid for itself."
+                </div>
+                <div class="gate-btn-group">
+                  <button class="btn btn-primary w-full" id="paywall-unlock-btn" onclick="handlePaywallUnlockClick()">Unlock Premium for $19.99</button>
+                  <button class="btn btn-link w-full text-center" onclick="closePaywallModal()">Maybe Later</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Global Floating Action Button for Community Posting -->
+            <button id="create-post-fab" class="create-post-fab" onclick="openCreatePostModal()" style="display: none;">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            </button>
+
+            <!-- Bottom Sheet: Create Community Post -->
+            <div class="bottom-sheet-modal" id="create-post-modal">
+              <div class="bottom-sheet-backdrop" onclick="closeCreatePostModal()"></div>
+              <div class="bottom-sheet-content glass-card" style="height: 85%; max-height: 500px; display:flex; flex-direction:column; padding-bottom: 25px;">
+                <div class="bottom-sheet-drag-handle"></div>
+                <h3 class="bottom-sheet-title">Share with Smono Circle</h3>
+                <p class="bottom-sheet-desc" style="margin-bottom:10px; font-size:12px; color:var(--color-text-secondary);">Inspire others or ask for support on your reset:</p>
+                
+                <div style="flex-grow:1; display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-right:2px; margin-bottom:15px;">
+                  <!-- Text Area -->
+                  <div>
+                    <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--color-text-secondary); display:block; margin-bottom:5px;">Your Message</label>
+                    <textarea id="new-post-text" placeholder="What is on your mind? Share your progress, tips, or ask a question..." style="width:100%; height:90px; padding:12px; border-radius:10px; border:1px solid var(--color-border-card); background:var(--color-bg-card); color:var(--color-text-primary); font-size:13px; font-weight:600; resize:none; outline:none; font-family:inherit;"></textarea>
+                  </div>
+                  
+                  <!-- Tag selection -->
+                  <div>
+                    <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--color-text-secondary); display:block; margin-bottom:5px;">Select Category Tag</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px;" id="new-post-tags-container">
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="daily update" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">daily update</span>
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="help" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">help</span>
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="milestone" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">milestone</span>
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="achievements" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">achievements</span>
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="success" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">success</span>
+                      <span class="trigger-pill select-post-tag" onclick="toggleSelectPostTag(this)" data-tag="tips" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">tips</span>
+                    </div>
+                  </div>
+
+                  <!-- Optional Image selection mock -->
+                  <div>
+                    <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--color-text-secondary); display:block; margin-bottom:5px;">Add Visual Vibe</label>
+                    <div style="display:flex; gap:8px; margin-bottom: 10px;" id="new-post-image-selects">
+                      <label class="image-select-btn" onclick="selectPostMockImage(this, 'coffee')" style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:8px; background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:10px; padding:10px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        ☕ Coffee
+                      </label>
+                      <label class="image-select-btn" onclick="selectPostMockImage(this, 'workout')" style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:8px; background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:10px; padding:10px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        💪 Workout
+                      </label>
+                      <label class="image-select-btn" onclick="selectPostMockImage(this, 'nature')" style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:8px; background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:10px; padding:10px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; text-align:center;">
+                        🌿 Nature
+                      </label>
+                    </div>
+                    <input type="hidden" id="new-post-image-type" value="" />
+
+                    <!-- Custom upload option -->
+                    <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--color-text-secondary); display:block; margin-bottom:5px;">Or Upload Your Own Photo</label>
+                    <button class="btn btn-secondary w-full" onclick="triggerPostImageUpload()" style="font-size: 11px; padding: 10px; display:flex; align-items:center; justify-content:center; gap:8px; border-radius: 10px;">
+                      📷 Choose Photo from Device
+                    </button>
+                    <input type="file" id="new-post-image-file" accept="image/*" onchange="handlePostImageUpload(this)" style="display: none;" />
+                    
+                    <!-- Preview Container -->
+                    <div id="new-post-image-preview-container" style="display: none; margin-top: 8px; position: relative;">
+                      <img id="new-post-image-preview" src="" style="width: 100%; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-border-card);" />
+                      <button onclick="removeUploadedPostImage()" style="position: absolute; top: 5px; right: 5px; background: rgba(15,23,42,0.85); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; display:flex; align-items:center; justify-content:center; font-size: 10px; cursor: pointer; font-weight:700;">✕</button>
+                    </div>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary w-full" onclick="submitCommunityPost()">Post to Feed</button>
+              </div>
+            </div>
+
+            <!-- Bottom Sheet: First Time Community Username Choice -->
+            <div class="bottom-sheet-modal" id="community-welcome-modal">
+              <div class="bottom-sheet-backdrop" onclick="closeCommunityWelcomeModal()"></div>
+              <div class="bottom-sheet-content glass-card" style="height: auto; max-height: 480px; display:flex; flex-direction:column; padding-bottom: 25px; z-index: 10010;">
+                <div class="bottom-sheet-drag-handle"></div>
+                <h3 class="bottom-sheet-title">Welcome to the Smono Community</h3>
+                <p class="bottom-sheet-desc" style="margin-bottom: 12px; font-size:12px; color:var(--color-text-secondary);">Choose your name for the community:</p>
+                
+                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;">
+                  <!-- Option 1: Keep original name -->
+                  <label id="label-keep-username" style="display:flex; align-items:center; gap:10px; background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:12px; padding:12px; font-size:12.5px; font-weight:700; cursor:pointer;" onclick="selectUsernameOption('keep')">
+                    <input type="radio" name="username-choice" id="radio-username-keep" checked style="accent-color:var(--color-accent-sky);" />
+                    Keep "<span id="username-preview-state">User</span>"
+                  </label>
+                  
+                  <!-- Option 2: Choose new name -->
+                  <label style="display:flex; align-items:center; gap:10px; background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:12px; padding:12px; font-size:12.5px; font-weight:700; cursor:pointer;" onclick="selectUsernameOption('new')">
+                    <input type="radio" name="username-choice" id="radio-username-new" style="accent-color:var(--color-accent-sky);" />
+                    Create a new username
+                  </label>
+
+                  <!-- New Username Text Input -->
+                  <div id="new-username-input-container" style="display: none; transition: all 0.2s;">
+                    <input type="text" id="new-username-input" placeholder="Enter username..." oninput="updateAppearNamePreview()" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--color-border-card); background:var(--color-bg-card); color:var(--color-text-primary); font-size:13px; font-weight:600;" />
+                  </div>
+
+                  <!-- Appearance Note -->
+                  <div style="background: rgba(59,130,246,0.06); border: 1px dashed rgba(59,130,246,0.2); border-radius:10px; padding:10px; text-align:center;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--color-text-secondary);">
+                      You'll appear as: <span id="community-appear-preview" style="color:var(--color-accent-sky); font-weight:800;">User</span>
+                    </span>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary w-full" onclick="saveCommunityUsername()">Save & Enter</button>
+              </div>
+            </div>
+
+            <!-- Video Story Player Modal (contained in simulator viewport) -->
+            <div id="video-story-player-modal" style="position: absolute; inset: 0; z-index: 20000; background: #000; border-radius: 36px; overflow: hidden; display: none;">
+              <!-- Close button -->
+              <button onclick="closeVideoStoryPlayer()" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; width: 32px; height: 32px; color: #fff; z-index: 20010; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; outline: none;">✕</button>
+              
+              <!-- Video element -->
+              <video id="story-player-video" src="" autoplay loop playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+              
+              <!-- Story Progress Bar -->
+              <div style="position: absolute; top: 8px; left: 10px; right: 10px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; z-index: 20005;">
+                <div id="video-story-progress-bar" style="width: 0%; height: 100%; background: #fff; transition: width 0.1s linear;"></div>
+              </div>
+              
+              <!-- User overlay info at bottom -->
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 25px 16px 30px; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%); color: #fff; z-index: 20005; pointer-events: none; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div id="video-story-avatar" class="post-avatar" style="width: 32px; height: 32px; font-size: 11px; border: 1.5px solid #fff;">SJ</div>
+                  <div>
+                    <div style="font-weight: 800; font-size: 13px;" id="video-story-author">Sarah Jenkins</div>
+                    <div style="font-size: 9.5px; color: rgba(255,255,255,0.8); font-weight: 700;" id="video-story-journey">Day 3 of the program</div>
+                  </div>
+                </div>
+                <p style="font-size: 11.5px; font-weight: 600; line-height: 1.45; margin: 0; color: rgba(255,255,255,0.95);" id="video-story-caption">
+                  My first morning without cravings! Coffee tastes so much better.
+                </p>
+              </div>
+            </div>
+
+            <!-- iPhone Home Indicator -->
+            <footer class="ios-home-indicator"></footer>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

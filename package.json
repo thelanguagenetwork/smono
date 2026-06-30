@@ -1,0 +1,12 @@
+{
+  "name": "smono-prototype",
+  "version": "1.0.0",
+  "description": "High-fidelity mobile app UI and prototype for Smono quit smoking wellness app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "author": "Antigravity",
+  "license": "ISC"
+}
