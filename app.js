@@ -26,7 +26,10 @@ const state = {
   onboardingActive: false,
   
   // Track questionnaire path (so we can go back cleanly)
-  questionHistory: []
+  questionHistory: [],
+  maxUnlockedDay: 1,
+  completedReflections: {},
+  completedTasks: {}
 };
 
 // --- Full List of Countries for Search Selector ---
@@ -65,7 +68,7 @@ const onboardingQuestions = [
   },
   {
     id: 3,
-    question: "What is your exact age?",
+    question: "What is your age?",
     support: "Nicotine biological recovery rate projections adapt to age groups.",
     type: "slider",
     min: 18,
@@ -1255,6 +1258,9 @@ function jumpToScreen(screenId) {
     }
   } else if (screenId === 'tracker') {
     updateTrackerRealtimeStats();
+    if (window.renderTrackerInsights) {
+      window.renderTrackerInsights();
+    }
   }
 
   // Update control panel active jumper button
@@ -1273,6 +1279,7 @@ function jumpToScreen(screenId) {
     if (greetingEl) {
       greetingEl.innerText = `Good morning, ${state.userName}`;
     }
+    triggerHomeTypewriter();
   } else if (screenId === 'profile') {
     const nameEl = document.getElementById('profile-user-name');
     if (nameEl) nameEl.innerText = state.userName;
@@ -1405,6 +1412,11 @@ function handleSettingsThemeToggle(checkbox) {
 // --- Program Paywall Gating & Locked Modules ---
 function setProgramAccess(hasPaid) {
   state.hasPaid = hasPaid;
+
+  const unlockCta = document.getElementById('home-unlock-smono-cta');
+  if (unlockCta) {
+    unlockCta.style.display = hasPaid ? 'none' : 'flex';
+  }
   
   const unpaidToggle = document.getElementById('toggle-unpaid');
   const paidToggle = document.getElementById('toggle-paid');
@@ -1417,18 +1429,12 @@ function setProgramAccess(hasPaid) {
     unpaidToggle.classList.add('active');
   }
 
-  // Refresh lock indicators on elements
-  const day2 = document.getElementById('day-2-card');
-  const day3 = document.getElementById('day-3-card');
-  const day4 = document.getElementById('day-4-card');
-  const day5 = document.getElementById('day-5-card');
+  // Refresh lock indicators on timeline selector cards
+  refreshTimelineLockStyles();
+  
   const modGate3 = document.getElementById('mod-gate-3');
 
   if (hasPaid) {
-    if (day2) day2.classList.remove('locked-card-preview');
-    if (day3) day3.classList.remove('locked-card-preview');
-    if (day4) day4.classList.remove('locked-card-preview');
-    if (day5) day5.classList.remove('locked-card-preview');
     if (modGate3) modGate3.classList.remove('locked-card-preview');
     
     // Remove lock checkbox styles
@@ -1454,10 +1460,6 @@ function setProgramAccess(hasPaid) {
       buyStatus.className = "item-value color-green";
     }
   } else {
-    if (day2) day2.classList.add('locked-card-preview');
-    if (day3) day3.classList.add('locked-card-preview');
-    if (day4) day4.classList.add('locked-card-preview');
-    if (day5) day5.classList.add('locked-card-preview');
     if (modGate3) modGate3.classList.add('locked-card-preview');
     
     // Restore lock checkbox styles
@@ -1482,10 +1484,17 @@ function setProgramAccess(hasPaid) {
       buyStatus.className = "item-value highlight-orange";
     }
   }
+  
+  // Refresh rendering of module cards to apply lock status changes
+  renderDailyModules(state.selectedProgramDay || 1);
 }
 
 function handleLockedCardClick(dayNum) {
-  if (dayNum === 1 || state.hasPaid) {
+  const isAccessible = dayNum === 1 || 
+                       dayNum <= state.maxUnlockedDay || 
+                       (state.completedReflections && state.completedReflections[dayNum - 1]);
+                       
+  if (isAccessible || state.hasPaid) {
     state.selectedProgramDay = dayNum;
     
     // Update timeline day active states
@@ -1500,11 +1509,8 @@ function handleLockedCardClick(dayNum) {
       }
     }
     
-    // Update module stack title header
-    const stackHeader = document.querySelector('.daily-modules-stack .stack-header h3');
-    if (stackHeader) {
-      stackHeader.innerText = `Day ${dayNum} Modules`;
-    }
+    // Render dynamic module stack content
+    renderDailyModules(dayNum);
     
     // Check if selected program day is <= 10 to show tracker widget
     const trackerWidget = document.getElementById('today-smoked-tracker-widget');
@@ -2160,18 +2166,24 @@ function closeStoryViewer() {
 
 function completeDay1Story() {
   closeStoryViewer();
-  state.day1LessonCompleted = true;
+  const currentDay = state.selectedProgramDay || 1;
   
-  const checkbox = document.getElementById('check-lesson');
-  const card = document.getElementById('day1-module-lesson');
-  if (checkbox) {
-    checkbox.classList.add('checked');
-    checkbox.innerText = '✓';
+  if (currentDay === 1) {
+    state.day1LessonCompleted = true;
   }
-  if (card) {
-    card.classList.add('completed');
+  
+  state.completedTasks = state.completedTasks || {};
+  const checkboxId = currentDay === 1 ? 'check-lesson' : `check-lesson-${currentDay}`;
+  state.completedTasks[checkboxId] = true;
+  
+  // Re-render currently selected modules stack
+  renderDailyModules(currentDay);
+  
+  if (currentDay === 1) {
+    alert("Awesome! You've completed the Day 1 Story Lesson. Now practice your 5-second pause and log your awareness details below!");
+  } else {
+    alert(`Awesome! You've completed the Day ${currentDay} Story Lesson.`);
   }
-  alert("Awesome! You've completed the Day 1 Story Lesson. Now practice your 5-second pause and log your awareness details below!");
 }
 
 function openAwarenessLog() {
@@ -2259,20 +2271,21 @@ function closeAwarenessLog() {
 
 function submitAwarenessLog() {
   closeAwarenessLog();
-  state.day1ExerciseCompleted = true;
-
-  const checkbox = document.getElementById('check-exercise');
-  const card = document.getElementById('day1-module-exercise');
-  if (checkbox) {
-    checkbox.classList.add('checked');
-    checkbox.innerText = '✓';
+  const currentDay = state.selectedProgramDay || 1;
+  
+  if (currentDay === 1) {
+    state.day1ExerciseCompleted = true;
   }
-  if (card) {
-    card.classList.add('completed');
-  }
+  
+  state.completedTasks = state.completedTasks || {};
+  const checkboxId = currentDay === 1 ? 'check-exercise' : `check-exercise-${currentDay}`;
+  state.completedTasks[checkboxId] = true;
 
   // Increment Today I Smoked counter on home page as well!
   incrementTodaySmoked();
+
+  // Re-render currently selected modules stack
+  renderDailyModules(currentDay);
 
   alert("Awareness log saved successfully! Smono added 1 tracked cigarette to your dashboard logger.");
 }
@@ -2347,24 +2360,32 @@ function closeReflectionModal() {
 
 function submitReflection() {
   closeReflectionModal();
-  state.day1ReflectionCompleted = true;
-
-  const checkbox = document.getElementById('check-reflection');
-  const card = document.getElementById('mod-gate-3');
-  if (checkbox) {
-    checkbox.classList.add('checked');
-    checkbox.innerHTML = '✓';
-    checkbox.classList.remove('lock-checkbox');
-  }
-  if (card) {
-    card.classList.add('completed');
-  }
-
-  // Trigger Day 1 congratulations overlay and set the 12 hour countdown timer for Day 2
-  state.day1Completed = true;
-  state.day2UnlockTime = Date.now() + (12 * 60 * 60 * 1000);
   
-  showDay1CongratsModal();
+  const currentDay = state.selectedProgramDay || 1;
+  state.completedReflections = state.completedReflections || {};
+  state.completedReflections[currentDay] = true;
+
+  state.completedTasks = state.completedTasks || {};
+  const checkboxId = currentDay === 1 ? 'check-reflection' : `check-reflection-${currentDay}`;
+  state.completedTasks[checkboxId] = true;
+
+  if (currentDay === state.maxUnlockedDay && state.maxUnlockedDay < 5) {
+    state.maxUnlockedDay++;
+    setUnlockedDayLimit(state.maxUnlockedDay);
+    alert(`Congratulations! You've completed Day ${currentDay} and unlocked Day ${state.maxUnlockedDay}!`);
+  } else {
+    alert(`Day ${currentDay} reflection submitted successfully!`);
+  }
+
+  // Handle Day 1 complete modal and timer specifically
+  if (currentDay === 1) {
+    state.day1ReflectionCompleted = true;
+    state.day1Completed = true;
+    state.day2UnlockTime = Date.now() + (12 * 60 * 60 * 1000);
+    showDay1CongratsModal();
+  } else {
+    renderDailyModules(currentDay);
+  }
 }
 
 // --- Smono Circle Community Logic ---
@@ -3140,11 +3161,18 @@ function startCongratsCountdown() {
 
   const tick = () => {
     const timerEl = document.getElementById('congrats-countdown-timer');
+    const overlayTimerEl = document.getElementById('home-day2-overlay-timer');
     const remainingMs = state.day2UnlockTime - Date.now();
     
     if (remainingMs <= 0) {
       if (timerEl) timerEl.innerText = "00:00:00";
+      if (overlayTimerEl) overlayTimerEl.innerText = "00:00:00";
       updateJourneyDay2Countdown("Unlocked!");
+      
+      if (state.selectedProgramDay === 2) {
+        renderDailyModules(2);
+      }
+      
       clearInterval(state.congratsInterval);
       return;
     }
@@ -3161,6 +3189,7 @@ function startCongratsCountdown() {
     const formattedTime = `${hrsStr}:${minsStr}:${secsStr}`;
 
     if (timerEl) timerEl.innerText = formattedTime;
+    if (overlayTimerEl) overlayTimerEl.innerText = formattedTime;
     updateJourneyDay2Countdown(formattedTime);
   };
 
@@ -3169,19 +3198,7 @@ function startCongratsCountdown() {
 }
 
 function updateJourneyDay2Countdown(timerStr) {
-  const day2Card = document.getElementById('day-2-card');
-  if (day2Card) {
-    let timerBadge = document.getElementById('day-2-countdown-badge');
-    if (!timerBadge) {
-      timerBadge = document.createElement('span');
-      timerBadge.id = 'day-2-countdown-badge';
-      timerBadge.style.cssText = 'font-size: 8px; font-weight:800; color:var(--color-text-secondary); background:rgba(15,23,42,0.06); padding:2px 6px; border-radius:10px; margin-left:8px; font-family:monospace; vertical-align: middle;';
-      
-      const headerRow = day2Card.querySelector('.card-desc') || day2Card;
-      headerRow.appendChild(timerBadge);
-    }
-    timerBadge.innerText = timerStr === "Unlocked!" ? "🔓 Unlocked!" : `🕒 Day 2 unlocks in: ${timerStr}`;
-  }
+  // Timeline calendar badge updates disabled to keep selector clean.
 }
 
 state.objectionSurveyAnswers = [];
@@ -3276,6 +3293,10 @@ window.onload = () => {
   // Set initial timeline day
   handleLockedCardClick(1);
   
+  if (state.day1Completed && state.day2UnlockTime && state.day2UnlockTime - Date.now() > 0) {
+    startCongratsCountdown();
+  }
+  
   // Start system clock
   updateIosTime();
   setInterval(updateIosTime, 1000);
@@ -3289,3 +3310,847 @@ window.onload = () => {
   document.getElementById('calc-cost').value = state.packCost;
   document.getElementById('calc-years').value = state.yearsSmoked;
 };
+
+function triggerHomeTypewriter() {
+  const el = document.getElementById('home-journey-title-header');
+  if (!el) return;
+  
+  const text = "Your New Journey Towards Freedom Begins";
+  el.textContent = "";
+  let i = 0;
+  
+  if (window.homeTypewriterTimer) {
+    clearInterval(window.homeTypewriterTimer);
+  }
+  window.homeTypewriterTimer = setInterval(() => {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(window.homeTypewriterTimer);
+    }
+  }, 30);
+}
+
+const dailyProgramData = {
+  1: {
+    tasksCount: "3 tasks",
+    modules: [
+      {
+        type: "Lesson",
+        duration: "5 mins",
+        title: "Seeing the Trap",
+        desc: "Instagram story reset guide: psychoeducation of the trap.",
+        action: "openStoryViewer()",
+        checkboxId: "check-lesson"
+      },
+      {
+        type: "Exercise",
+        duration: "4 mins",
+        title: "The Awareness Log",
+        desc: "Obsessional tracking: Time, Trigger, and choice logs.",
+        action: "openAwarenessLog()",
+        checkboxId: "check-exercise"
+      },
+      {
+        type: "Reflection",
+        duration: "3 mins",
+        title: "Evening Reflection",
+        desc: "Lock statement analysis & your first smoking history check.",
+        action: "handleReflectionCardClick()",
+        checkboxId: "check-reflection",
+        isLocked: true
+      }
+    ]
+  },
+  2: {
+    tasksCount: "3 tasks",
+    modules: [
+      {
+        type: "Lesson",
+        duration: "6 mins",
+        title: "The Nicotine Bubble",
+        desc: "Unmasking the chemical illusion and withdrawal curve.",
+        action: "openStoryViewer()",
+        checkboxId: "check-lesson-2"
+      },
+      {
+        type: "Exercise",
+        duration: "5 mins",
+        title: "Trigger Mapping",
+        desc: "Categorize your daily cravings into environmental cues.",
+        action: "openAwarenessLog()",
+        checkboxId: "check-exercise-2"
+      },
+      {
+        type: "Reflection",
+        duration: "3 mins",
+        title: "Belief Disruption Log",
+        desc: "Examine the thought: 'Cigarettes relieve my stress.'",
+        action: "handleReflectionCardClick()",
+        checkboxId: "check-reflection-2",
+        isLocked: true
+      }
+    ]
+  },
+  3: {
+    tasksCount: "3 tasks",
+    modules: [
+      {
+        type: "Lesson",
+        duration: "5 mins",
+        title: "Social Conditioning",
+        desc: "Why friends, drinks, and coffee feel incomplete without smoke.",
+        action: "openStoryViewer()",
+        checkboxId: "check-lesson-3"
+      },
+      {
+        type: "Exercise",
+        duration: "6 mins",
+        title: "The Delay Protocol",
+        desc: "Practice waiting out physical cravings with tactile pauses.",
+        action: "openAwarenessLog()",
+        checkboxId: "check-exercise-3"
+      },
+      {
+        type: "Reflection",
+        duration: "4 mins",
+        title: "Daily Freedom Anchor",
+        desc: "Define your core quitting anchor and long-term values.",
+        action: "handleReflectionCardClick()",
+        checkboxId: "check-reflection-3",
+        isLocked: true
+      }
+    ]
+  },
+  4: {
+    tasksCount: "3 tasks",
+    modules: [
+      {
+        type: "Lesson",
+        duration: "6 mins",
+        title: "Stress & Willpower Trap",
+        desc: "Why fighting cravings with willpower backfires every time.",
+        action: "openStoryViewer()",
+        checkboxId: "check-lesson-4"
+      },
+      {
+        type: "Exercise",
+        duration: "4 mins",
+        title: "Breath Shift Exercise",
+        desc: "A somatic replacement loop for deep stress relaxation.",
+        action: "openAwarenessLog()",
+        checkboxId: "check-exercise-4"
+      },
+      {
+        type: "Reflection",
+        duration: "3 mins",
+        title: "Evening Cravings Scan",
+        desc: "Audit the cues that triggered you today and how you handled them.",
+        action: "handleReflectionCardClick()",
+        checkboxId: "check-reflection-4",
+        isLocked: true
+      }
+    ]
+  },
+  5: {
+    tasksCount: "3 tasks",
+    modules: [
+      {
+        type: "Lesson",
+        duration: "7 mins",
+        title: "The Final Cigarette Mindset",
+        desc: "Preparing your mindset for the complete break from nicotine.",
+        action: "openStoryViewer()",
+        checkboxId: "check-lesson-5"
+      },
+      {
+        type: "Exercise",
+        duration: "5 mins",
+        title: "Reclaiming Rituals",
+        desc: "Replace your morning smoke with a new rewarding action.",
+        action: "openAwarenessLog()",
+        checkboxId: "check-exercise-5"
+      },
+      {
+        type: "Reflection",
+        duration: "4 mins",
+        title: "Day 5 Commitment Audit",
+        desc: "Review your milestones, chemical recovery, and baseline confidence.",
+        action: "handleReflectionCardClick()",
+        checkboxId: "check-reflection-5",
+        isLocked: true
+      }
+    ]
+  }
+};
+
+function renderDailyModules(dayNum) {
+  const stack = document.querySelector('.daily-modules-stack');
+  if (!stack) return;
+  
+  const data = dailyProgramData[dayNum] || dailyProgramData[1];
+  
+  let html = `
+    <div class="stack-header">
+      <h3>Day ${dayNum} Modules</h3>
+      <span>${data.tasksCount}</span>
+    </div>
+  `;
+  
+  // Check if Day is countdown-locked (previous day completed, not premium, unlocked days max limit < dayNum, unlock time in future)
+  const isDayTimerLocked = state.unlockTimers && state.unlockTimers[dayNum] && (state.unlockTimers[dayNum] - Date.now() > 0) && dayNum > state.maxUnlockedDay;
+  
+  if (isDayTimerLocked) {
+    const remainingMs = state.unlockTimers[dayNum] - Date.now();
+    const formattedTime = formatMsToTime(remainingMs);
+
+    html += `
+      <div style="width: 100%; border-radius: 16px; margin-top: 15px; display: flex; justify-content: center; align-items: center; min-height: 220px; box-sizing: border-box;">
+        <div class="glass-card" style="padding: 24px 20px; border-radius: 16px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); box-shadow: 0 10px 25px -10px rgba(0,0,0,0.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 320px; text-align: center;">
+          <span style="font-size: 26px;">🕒</span>
+          <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--color-text-secondary); letter-spacing: 0.5px;">Day ${dayNum} Unlocks In</span>
+          <div id="home-day-overlay-timer" style="font-size: 28px; font-weight: 900; color: var(--color-accent-sky); font-family: monospace; letter-spacing: 1px; line-height: 1; margin: 4px 0;">
+            ${formattedTime}
+          </div>
+          <p style="font-size: 11px; font-weight: 600; color: var(--color-text-secondary); margin: 0; line-height: 1.45;">
+            Take a break, rest, and reflect. Your mind is adapting.
+          </p>
+          <div style="margin-top: 8px; font-size: 10px; font-weight: 700; color: var(--color-text-muted); background: rgba(15,23,42,0.04); padding: 4px 10px; border-radius: 8px; display: inline-block;">
+            WHO recommendation: 12h pause between modules
+          </div>
+        </div>
+      </div>
+    `;
+    
+    stack.innerHTML = html;
+    return;
+  }
+  
+  data.modules.forEach(m => {
+    const isActuallyLocked = m.isLocked && !state.hasPaid;
+    const lockClass = isActuallyLocked ? ' locked-card-preview' : '';
+    
+    // Check if task is completed
+    const isCompleted = (state.completedTasks && state.completedTasks[m.checkboxId]) ||
+                        (state.day1LessonCompleted && m.checkboxId === 'check-lesson') ||
+                        (state.day1ExerciseCompleted && m.checkboxId === 'check-exercise') ||
+                        (state.day1ReflectionCompleted && m.checkboxId === 'check-reflection') ||
+                        (state.completedReflections && state.completedReflections[dayNum] && m.type === 'Reflection');
+
+    // Create micro image icon container
+    let microImageSvg = '';
+    let thumbnailBg = '';
+    
+    if (m.type === 'Lesson') {
+      thumbnailBg = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
+      microImageSvg = `
+        <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      `;
+    } else if (m.type === 'Exercise') {
+      thumbnailBg = 'linear-gradient(135deg, #10b981 0%, #047857 100%)';
+      microImageSvg = `
+        <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      `;
+    } else { // Reflection
+      thumbnailBg = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+      microImageSvg = `
+        <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 113.536 0V21h-7v-3.464z" />
+        </svg>
+      `;
+    }
+
+    // Bottom-right status tick positioning HTML
+    let completedTickHtml = '';
+    if (isActuallyLocked) {
+      completedTickHtml = `
+        <div style="position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; border-radius: 50%; background: rgba(15,23,42,0.06); color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; font-size: 8px;">
+          <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        </div>
+      `;
+    } else if (isCompleted) {
+      completedTickHtml = `
+        <div style="position: absolute; bottom: 12px; right: 12px; width: 18px; height: 18px; border-radius: 50%; background: var(--color-primary-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; box-shadow: var(--shadow-sm);">✓</div>
+      `;
+    } else {
+      completedTickHtml = `
+        <div style="position: absolute; bottom: 12px; right: 12px; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--color-border-card); background: transparent;"></div>
+      `;
+    }
+
+    html += `
+      <div class="module-task-card glass-card${lockClass}" onclick="${isActuallyLocked ? 'handleReflectionCardClick()' : m.action}" style="position: relative; display: flex; gap: 14px; padding: 14px; align-items: flex-start; min-height: 80px;">
+        <div style="width: 42px; height: 42px; border-radius: 10px; background: ${thumbnailBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); box-shadow: var(--shadow-sm);">
+          ${microImageSvg}
+        </div>
+        <div class="mod-info" style="flex-grow: 1; padding-right: 18px;">
+          <span class="mod-tag">${m.type} • ${m.duration}</span>
+          <h4 style="margin: 3px 0; font-size: 13.5px; font-weight: 800; color: var(--color-text-primary);">${m.title}</h4>
+          <p style="margin: 0; font-size: 11px; line-height: 1.45; color: var(--color-text-secondary);">${m.desc}</p>
+        </div>
+        ${completedTickHtml}
+        ${isActuallyLocked ? '<div class="premium-shimmer-effect"></div>' : ''}
+      </div>
+    `;
+  });
+  
+  stack.innerHTML = html;
+}
+
+function setUnlockedDayLimit(dayNum) {
+  state.maxUnlockedDay = dayNum;
+  
+  // Set all previous reflections as completed for clean testing
+  state.completedReflections = state.completedReflections || {};
+  for (let d = 1; d < dayNum; d++) {
+    state.completedReflections[d] = true;
+    if (state.unlockTimers) {
+      state.unlockTimers[d + 1] = null; // Clear unlock timers for unlocked days
+    }
+  }
+
+  // Refresh active program buttons in jumper
+  const levelBtns = document.querySelectorAll('.program-level-btn');
+  levelBtns.forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('onclick').includes(`setUnlockedDayLimit(${dayNum})`)) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Refresh lock indicators on timeline selector cards
+  refreshTimelineLockStyles();
+
+  // Re-render currently selected modules stack
+  renderDailyModules(state.selectedProgramDay || 1);
+}
+
+function refreshTimelineLockStyles() {
+  for (let d = 2; d <= 5; d++) {
+    const card = document.getElementById(`day-${d}-card`);
+    if (card) {
+      const isAccessible = d <= state.maxUnlockedDay || 
+                           (d === state.maxUnlockedDay + 1 && state.completedReflections[state.maxUnlockedDay]);
+      
+      if (isAccessible || state.hasPaid) {
+        card.classList.remove('locked-card-preview');
+        const lockIcon = card.querySelector('.day-status-icon');
+        if (lockIcon) lockIcon.innerHTML = '';
+      } else {
+        card.classList.add('locked-card-preview');
+        const lockIcon = card.querySelector('.day-status-icon');
+        if (lockIcon) {
+          lockIcon.innerHTML = '<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7v3H6c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm-3 5c0-1.66 1.34-3 3-3s3 1.34 3 3v3H9V7zm3 10c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>';
+        }
+      }
+    }
+  }
+}
+
+window.setUnlockedDayLimit = setUnlockedDayLimit;
+window.refreshTimelineLockStyles = refreshTimelineLockStyles;
+
+function openQuickAddPanel() {
+  const oldPanel = document.getElementById('quick-add-panel');
+  if (oldPanel) oldPanel.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'quick-add-panel';
+  modal.className = 'bottom-sheet-modal active';
+  modal.innerHTML = `
+    <div class="bottom-sheet-backdrop" onclick="closeQuickAddPanel()"></div>
+    <div class="bottom-sheet-content glass-card" style="height: auto; max-height: 520px; display:flex; flex-direction:column; padding-bottom: 25px; border-top-left-radius: 24px; border-top-right-radius: 24px; background: var(--color-bg-card);">
+      <div class="bottom-sheet-drag-handle"></div>
+      
+      <h3 class="bottom-sheet-title" style="margin-bottom: 8px; font-size: 18px; font-weight: 800; text-align: center; color: var(--color-text-primary);">Quick Add Entry</h3>
+      <p style="font-size: 11.5px; font-weight: 600; color: var(--color-text-secondary); text-align: center; margin: 0; margin-bottom: 20px;">
+        Register details to update your statistics and trackers.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 0 5px;">
+        
+        <!-- Option 1: I have smoked -->
+        <button class="glass-card" onclick="handleQuickAddSmoked()" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--color-border-card); background: rgba(239, 68, 68, 0.04); text-align: left; cursor: pointer; transition: all 0.2s; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">🚬</span>
+            <div>
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: var(--color-text-primary);">I have smoked</h4>
+              <p style="margin: 0; font-size: 10.5px; color: var(--color-text-muted);">Add 1 cigarette to today's count</p>
+            </div>
+          </div>
+          <span style="font-size: 16px; color: var(--color-text-secondary);">&rarr;</span>
+        </button>
+
+        <!-- Option 2: I have a craving -->
+        <button class="glass-card" onclick="handleQuickAddCraving()" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--color-border-card); background: rgba(245, 158, 11, 0.04); text-align: left; cursor: pointer; transition: all 0.2s; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">⚡</span>
+            <div>
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: var(--color-text-primary);">I have a craving</h4>
+              <p style="margin: 0; font-size: 10.5px; color: var(--color-text-muted);">Log cravings stats and trigger logs</p>
+            </div>
+          </div>
+          <span style="font-size: 16px; color: var(--color-text-secondary);">&rarr;</span>
+        </button>
+
+        <!-- Option 3: Track your mood -->
+        <button class="glass-card" onclick="handleQuickAddMood()" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--color-border-card); background: rgba(16, 185, 129, 0.04); text-align: left; cursor: pointer; transition: all 0.2s; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">🧘</span>
+            <div>
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: var(--color-text-primary);">Track your mood</h4>
+              <p style="margin: 0; font-size: 10.5px; color: var(--color-text-muted);">Record how you are feeling right now</p>
+            </div>
+          </div>
+          <span style="font-size: 16px; color: var(--color-text-secondary);">&rarr;</span>
+        </button>
+
+        <!-- Option 4: Add a savings goal -->
+        <button class="glass-card" onclick="handleQuickAddSavings()" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--color-border-card); background: rgba(59, 130, 246, 0.04); text-align: left; cursor: pointer; transition: all 0.2s; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">💰</span>
+            <div>
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: var(--color-text-primary);">Add a savings goal</h4>
+              <p style="margin: 0; font-size: 10.5px; color: var(--color-text-muted);">Set target amounts for what you save</p>
+            </div>
+          </div>
+          <span style="font-size: 16px; color: var(--color-text-secondary);">&rarr;</span>
+        </button>
+
+      </div>
+      
+      <button class="btn btn-secondary w-full" onclick="closeQuickAddPanel()" style="margin-top: 18px;">Cancel</button>
+    </div>
+  `;
+
+  const phoneDisplay = document.getElementById('phone-display') || document.body;
+  phoneDisplay.appendChild(modal);
+}
+
+function closeQuickAddPanel() {
+  const modal = document.getElementById('quick-add-panel');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.opacity = '0';
+    setTimeout(() => modal.remove(), 300);
+  }
+}
+
+function handleQuickAddSmoked() {
+  incrementTodaySmoked();
+  closeQuickAddPanel();
+  if (state.currentScreenId === 'tracker') {
+    renderTrackerInsights();
+  }
+  alert("Cigarette logged successfully! Smono updated your progress counts and dashboard statistics.");
+}
+
+function handleQuickAddCraving() {
+  const content = document.querySelector('#quick-add-panel .bottom-sheet-content');
+  if (!content) return;
+  
+  content.innerHTML = `
+    <div class="bottom-sheet-drag-handle"></div>
+    <h3 class="bottom-sheet-title" style="margin-bottom: 8px; font-size: 18px; font-weight: 800; text-align: center; color: var(--color-text-primary);">Log Cravings Trigger</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px; text-align: left;">
+      <div>
+        <label style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--color-text-secondary); display: block; margin-bottom: 6px;">Select Trigger</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="craving-triggers-container">
+          ${['Stress', 'Boredom', 'After Meal', 'Driving', 'Socializing', 'Morning Routine'].map(t => `
+            <span class="trigger-pill" onclick="selectQuickAddTrigger(this)" style="background:var(--color-bg-card); border:1px solid var(--color-border-card); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; color:var(--color-text-secondary); cursor:pointer; transition:all 0.2s;">${t}</span>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <label style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--color-text-secondary);">Craving Intensity</label>
+          <span id="quick-craving-intensity-val" style="font-size:12px; font-weight:800; color:var(--color-accent-sky);">5/10</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" oninput="document.getElementById('quick-craving-intensity-val').innerText = this.value + '/10'" style="width: 100%; accent-color: var(--color-accent-sky);" />
+      </div>
+      
+      <button class="btn btn-primary w-full" onclick="saveQuickAddCraving()" style="margin-top: 10px;">Save Craving Log</button>
+      <button class="btn btn-secondary w-full" onclick="openQuickAddPanel()">Back</button>
+    </div>
+  `;
+}
+
+function selectQuickAddTrigger(el) {
+  const pills = document.querySelectorAll('#craving-triggers-container .trigger-pill');
+  pills.forEach(p => {
+    p.style.background = 'var(--color-bg-card)';
+    p.style.borderColor = 'var(--color-border-card)';
+    p.style.color = 'var(--color-text-secondary)';
+    p.classList.remove('selected');
+  });
+  el.style.background = 'var(--color-accent-sky)';
+  el.style.borderColor = 'var(--color-accent-sky)';
+  el.style.color = '#fff';
+  el.classList.add('selected');
+}
+
+function saveQuickAddCraving() {
+  const activeTrigger = document.querySelector('#craving-triggers-container .trigger-pill.selected');
+  const triggerVal = activeTrigger ? activeTrigger.innerText : 'Unknown Trigger';
+  
+  state.cravingLogs = state.cravingLogs || [];
+  state.cravingLogs.push({
+    timestamp: Date.now(),
+    trigger: triggerVal,
+    intensity: document.getElementById('quick-craving-intensity-val') ? document.getElementById('quick-craving-intensity-val').innerText : '5/10'
+  });
+  
+  closeQuickAddPanel();
+  if (state.currentScreenId === 'tracker') {
+    renderTrackerInsights();
+  }
+  alert(`Craving registered! Trigger logged as: ${triggerVal}. Pause and deep breathe!`);
+}
+
+function handleQuickAddMood() {
+  const content = document.querySelector('#quick-add-panel .bottom-sheet-content');
+  if (!content) return;
+  
+  content.innerHTML = `
+    <div class="bottom-sheet-drag-handle"></div>
+    <h3 class="bottom-sheet-title" style="margin-bottom: 8px; font-size: 18px; font-weight: 800; text-align: center; color: var(--color-text-primary);">Track Your Mood</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px; text-align:center;">
+      <p style="font-size: 11.5px; font-weight:600; color:var(--color-text-secondary);">How are you feeling right now?</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0;">
+        ${[
+          { emoji: '😊', label: 'Happy' },
+          { emoji: '😔', label: 'Sad' },
+          { emoji: '😰', label: 'Anxious' },
+          { emoji: '😡', label: 'Irritated' },
+          { emoji: '🥱', label: 'Bored' },
+          { emoji: '⚡', label: 'Restless' },
+          { emoji: '😴', label: 'Tired' },
+          { emoji: '😇', label: 'Calm' }
+        ].map(m => `
+          <button onclick="selectQuickAddMood(this, '${m.label}')" class="glass-card mood-select-btn" style="display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px; border: 1.5px solid var(--color-border-card); background:transparent; border-radius:12px; cursor:pointer; transition:all 0.2s; outline:none;">
+            <span style="font-size: 24px;">${m.emoji}</span>
+            <span style="font-size: 9.5px; font-weight: 700; color:var(--color-text-secondary);">${m.label}</span>
+          </button>
+        `).join('')}
+      </div>
+      
+      <button class="btn btn-primary w-full" onclick="saveQuickAddMood()" style="margin-top: 10px;">Save Mood Log</button>
+      <button class="btn btn-secondary w-full" onclick="openQuickAddPanel()">Back</button>
+    </div>
+  `;
+}
+
+function selectQuickAddMood(btn, label) {
+  const btns = document.querySelectorAll('.mood-select-btn');
+  btns.forEach(b => {
+    b.style.borderColor = 'var(--color-border-card)';
+    b.style.background = 'transparent';
+    b.classList.remove('selected');
+  });
+  btn.style.borderColor = 'var(--color-accent-sky)';
+  btn.style.background = 'rgba(56, 189, 248, 0.08)';
+  btn.classList.add('selected');
+  state.selectedQuickMood = label;
+}
+
+function saveQuickAddMood() {
+  const mood = state.selectedQuickMood || 'Calm';
+  state.moodLogs = state.moodLogs || [];
+  state.moodLogs.push({
+    timestamp: Date.now(),
+    mood: mood
+  });
+  
+  closeQuickAddPanel();
+  if (state.currentScreenId === 'tracker') {
+    renderTrackerInsights();
+  }
+  alert(`Mood saved! You logged your current feeling as: ${mood}. Smono will reflect this in your analytics.`);
+}
+
+function handleQuickAddSavings() {
+  const content = document.querySelector('#quick-add-panel .bottom-sheet-content');
+  if (!content) return;
+  
+  content.innerHTML = `
+    <div class="bottom-sheet-drag-handle"></div>
+    <h3 class="bottom-sheet-title" style="margin-bottom: 8px; font-size: 18px; font-weight: 800; text-align: center; color: var(--color-text-primary);">Add a Savings Goal</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px; text-align: left;">
+      <div>
+        <label style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--color-text-secondary); display: block; margin-bottom: 5px;">What are you saving for?</label>
+        <input type="text" id="quick-savings-title" placeholder="e.g. Flight to Greece, New Gym Shoes" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--color-border-card); background:var(--color-bg-card); color:var(--color-text-primary); font-size:13px; font-weight:600;" />
+      </div>
+      
+      <div>
+        <label style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--color-text-secondary); display: block; margin-bottom: 5px;">Target Amount ($)</label>
+        <input type="number" id="quick-savings-amount" value="100" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--color-border-card); background:var(--color-bg-card); color:var(--color-text-primary); font-size:13px; font-weight:600;" />
+      </div>
+      
+      <button class="btn btn-primary w-full" onclick="saveQuickAddSavings()" style="margin-top: 10px;">Save Goal</button>
+      <button class="btn btn-secondary w-full" onclick="openQuickAddPanel()">Back</button>
+    </div>
+  `;
+}
+
+function saveQuickAddSavings() {
+  const goalTitle = document.getElementById('quick-savings-title').value || 'Unlabeled Goal';
+  const goalAmount = parseFloat(document.getElementById('quick-savings-amount').value) || 100.0;
+  
+  state.savingsGoals = state.savingsGoals || [];
+  state.savingsGoals.push({
+    title: goalTitle,
+    target: goalAmount
+  });
+  
+  const revealTitleEl = document.getElementById('cost-reveal-goal-title');
+  const revealTargetEl = document.getElementById('cost-reveal-goal-target');
+  if (revealTitleEl) revealTitleEl.innerText = goalTitle;
+  if (revealTargetEl) revealTargetEl.innerText = `$${goalAmount.toFixed(2)}`;
+  
+  closeQuickAddPanel();
+  if (state.currentScreenId === 'tracker') {
+    renderTrackerInsights();
+  }
+  alert(`Savings goal saved! Smono updated your progress target to save towards: ${goalTitle}.`);
+}
+
+window.openQuickAddPanel = openQuickAddPanel;
+window.closeQuickAddPanel = closeQuickAddPanel;
+window.handleQuickAddSmoked = handleQuickAddSmoked;
+window.handleQuickAddCraving = handleQuickAddCraving;
+window.selectQuickAddTrigger = selectQuickAddTrigger;
+window.saveQuickAddCraving = saveQuickAddCraving;
+window.handleQuickAddMood = handleQuickAddMood;
+window.selectQuickAddMood = selectQuickAddMood;
+window.saveQuickAddMood = saveQuickAddMood;
+window.handleQuickAddSavings = handleQuickAddSavings;
+window.saveQuickAddSavings = saveQuickAddSavings;
+
+function renderTrackerInsights() {
+  const container = document.getElementById('tracker-insights-section');
+  if (!container) return;
+
+  // 1. Cigarettes Smoked history summary
+  let todaySmoked = state.todaySmokedCount || 0;
+  let totalSmokedTracked = 0;
+  if (state.dailySmokedLogs) {
+    Object.values(state.dailySmokedLogs).forEach(v => {
+      totalSmokedTracked += parseInt(v) || 0;
+    });
+  }
+  totalSmokedTracked = Math.max(totalSmokedTracked, todaySmoked);
+
+  let smokedHtml = `
+    <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align: left;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="margin:0; font-size:13px; font-weight:800; color:var(--color-text-primary); display:flex; align-items:center; gap:8px;">
+          <span>🚬</span> Cigarettes Smoked Log
+        </h4>
+        <span style="font-size:10px; font-weight:800; background:rgba(239,68,68,0.08); color:#ef4444; padding:2px 8px; border-radius:10px;">Active</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:center;">
+        <div style="background:rgba(15,23,42,0.03); padding:10px; border-radius:10px;">
+          <span style="font-size:9px; font-weight:800; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.3px;">Today</span>
+          <h3 style="margin:2px 0 0 0; font-size:20px; font-weight:900; color:var(--color-text-primary);">${todaySmoked}</h3>
+        </div>
+        <div style="background:rgba(15,23,42,0.03); padding:10px; border-radius:10px;">
+          <span style="font-size:9px; font-weight:800; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.3px;">Total Tracked</span>
+          <h3 style="margin:2px 0 0 0; font-size:20px; font-weight:900; color:var(--color-text-primary);">${totalSmokedTracked}</h3>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 2. Cravings Trigger & Intensity Interpretation
+  let cravingHtml = '';
+  const cravings = state.cravingLogs || [];
+  
+  if (cravings.length === 0) {
+    cravingHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align:center; padding: 25px 15px;">
+        <span style="font-size:24px;">⚡</span>
+        <h4 style="margin:8px 0 4px 0; font-size:13px; font-weight:800; color:var(--color-text-primary);">Triggers & Cravings Analysis</h4>
+        <p style="margin:0; font-size:11px; color:var(--color-text-muted); line-height:1.4;">No cravings tracked yet. Use the <strong>+ Button</strong> at the top right to log a craving entry and generate your CBT insights!</p>
+      </div>
+    `;
+  } else {
+    const triggerCounts = {};
+    let totalIntensity = 0;
+    cravings.forEach(c => {
+      triggerCounts[c.trigger] = (triggerCounts[c.trigger] || 0) + 1;
+      const intensityNum = parseInt(c.intensity) || 5;
+      totalIntensity += intensityNum;
+    });
+
+    let topTrigger = 'Unknown';
+    let maxCount = 0;
+    Object.keys(triggerCounts).forEach(t => {
+      if (triggerCounts[t] > maxCount) {
+        maxCount = triggerCounts[t];
+        topTrigger = t;
+      }
+    });
+
+    const avgIntensity = (totalIntensity / cravings.length).toFixed(1);
+
+    let interpretationText = '';
+    if (topTrigger === 'Stress') {
+      interpretationText = 'Your cravings are heavily linked to stress. This shows you are using nicotine to regulate emotional states. Practice Smono\'s 5-second pause to create space for a healthy response.';
+    } else if (topTrigger === 'Boredom') {
+      interpretationText = 'You tend to vape/smoke when bored. This indicates nicotine is acting as a physical reward filler. Substitution therapy (chewing gum, brief walks) is highly effective for this trigger.';
+    } else if (topTrigger === 'Socializing') {
+      interpretationText = 'Your social environment is a strong trigger. Peer associations trigger automatic mimicry. Try telling friends you are pausing before you meet up.';
+    } else if (topTrigger === 'After Meal' || topTrigger === 'Morning Routine') {
+      interpretationText = 'This is a classical motor habit loop trigger. You have paired finishing a meal or waking up with smoking. Disrupt this loop by changing your immediate physical location right after these events.';
+    } else {
+      interpretationText = 'Your trigger profile indicates a mix of environmental cues. Pause for 5 seconds before lighting up to analyze the trigger, which weakens the classical conditioning link.';
+    }
+
+    cravingHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align: left;">
+        <h4 style="margin:0 0 12px 0; font-size:13px; font-weight:800; color:var(--color-text-primary); display:flex; align-items:center; gap:8px;">
+          <span>⚡</span> Triggers & Cravings Analysis
+        </h4>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; text-align:center;">
+          <div style="background:rgba(245,158,11,0.03); padding:10px; border-radius:10px; border:1px solid rgba(245,158,11,0.15);">
+            <span style="font-size:9px; font-weight:800; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.3px;">Top Trigger</span>
+            <h4 style="margin:2px 0 0 0; font-size:14px; font-weight:900; color:var(--color-accent-orange);">${topTrigger}</h4>
+          </div>
+          <div style="background:rgba(56,189,248,0.03); padding:10px; border-radius:10px; border:1px solid rgba(56,189,248,0.15);">
+            <span style="font-size:9px; font-weight:800; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.3px;">Avg Intensity</span>
+            <h4 style="margin:2px 0 0 0; font-size:14px; font-weight:900; color:var(--color-accent-sky);">${avgIntensity}/10</h4>
+          </div>
+        </div>
+
+        <div style="background:rgba(59,130,246,0.05); padding:12px; border-radius:12px; border:1px solid var(--color-border-card);">
+          <span style="font-size:9px; font-weight:800; color:var(--color-accent-sky); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px;">CBT Interpretation</span>
+          <p style="margin:0; font-size:11px; line-height:1.45; color:var(--color-text-primary); font-weight:600;">
+            ${interpretationText}
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
+  // 3. Mood tracking history
+  let moodHtml = '';
+  const moods = state.moodLogs || [];
+  if (moods.length === 0) {
+    moodHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align:center; padding: 25px 15px;">
+        <span style="font-size:24px;">🧘</span>
+        <h4 style="margin:8px 0 4px 0; font-size:13px; font-weight:800; color:var(--color-text-primary);">Mood Tracking History</h4>
+        <p style="margin:0; font-size:11px; color:var(--color-text-muted); line-height:1.4;">No mood logs recorded yet. Tap the <strong>+ Button</strong> at the top right to record your first mood!</p>
+      </div>
+    `;
+  } else {
+    const recentMoods = moods.slice(-5).reverse();
+    const moodEmojis = {
+      'Happy': '😊',
+      'Sad': '😔',
+      'Anxious': '😰',
+      'Irritated': '😡',
+      'Bored': '🥱',
+      'Restless': '⚡',
+      'Tired': '😴',
+      'Calm': '😇'
+    };
+
+    let listHtml = '';
+    recentMoods.forEach(m => {
+      const emoji = moodEmojis[m.mood] || '😊';
+      const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      listHtml += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:rgba(15,23,42,0.03); border-radius:10px; margin-bottom:6px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">${emoji}</span>
+            <span style="font-size:12px; font-weight:800; color:var(--color-text-primary);">${m.mood}</span>
+          </div>
+          <span style="font-size:10px; font-weight:700; color:var(--color-text-muted);">${timeStr}</span>
+        </div>
+      `;
+    });
+
+    moodHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align: left;">
+        <h4 style="margin:0 0 12px 0; font-size:13px; font-weight:800; color:var(--color-text-primary); display:flex; align-items:center; gap:8px;">
+          <span>🧘</span> Mood History (Recent)
+        </h4>
+        <div>
+          ${listHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  // 4. Savings Goals
+  let savingsHtml = '';
+  const goals = state.savingsGoals || [];
+  
+  let totalSavedAmount = 0;
+  const savedMoneyEl = document.getElementById('tracker-money-saved');
+  if (savedMoneyEl) {
+    totalSavedAmount = parseFloat(savedMoneyEl.innerText.replace('$', '')) || 0;
+  }
+  if (totalSavedAmount === 0) {
+    totalSavedAmount = 9.00;
+  }
+
+  if (goals.length === 0) {
+    savingsHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align:center; padding: 25px 15px;">
+        <span style="font-size:24px;">💰</span>
+        <h4 style="margin:8px 0 4px 0; font-size:13px; font-weight:800; color:var(--color-text-primary);">Savings Goals Progress</h4>
+        <p style="margin:0; font-size:11px; color:var(--color-text-muted); line-height:1.4;">No savings goals defined yet. Use the <strong>+ Button</strong> at the top right to set your first target!</p>
+      </div>
+    `;
+  } else {
+    let goalsListHtml = '';
+    goals.forEach(g => {
+      const pct = Math.min(100, Math.round((totalSavedAmount / g.target) * 100));
+      goalsListHtml += `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:12px; font-weight:800; color:var(--color-text-primary);">${g.title}</span>
+            <span style="font-size:11px; font-weight:800; color:var(--color-primary-green);">${pct}% ($${totalSavedAmount.toFixed(2)} / $${g.target.toFixed(0)})</span>
+          </div>
+          <div style="height:6px; background:rgba(15,23,42,0.06); border-radius:3px; overflow:hidden;">
+            <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, #10b981 0%, #059669 100%); border-radius:3px;"></div>
+          </div>
+        </div>
+      `;
+    });
+
+    savingsHtml = `
+      <div class="glass-card" style="padding: 16px; border-radius: 18px; border: 1.5px solid var(--color-border-card); background: var(--color-bg-card); text-align: left;">
+        <h4 style="margin:0 0 12px 0; font-size:13px; font-weight:800; color:var(--color-text-primary); display:flex; align-items:center; gap:8px;">
+          <span>💰</span> Savings Goals Progress
+        </h4>
+        <div>
+          ${goalsListHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <h3 style="font-size:11px; font-weight:900; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin: 15px 0 5px 0; text-align: left;">Insights & Analytics</h3>
+    ${smokedHtml}
+    ${cravingHtml}
+    ${moodHtml}
+    ${savingsHtml}
+  `;
+}
+
+window.renderTrackerInsights = renderTrackerInsights;

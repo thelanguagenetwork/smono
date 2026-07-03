@@ -76,6 +76,13 @@
             Premium Tier (All Days Unlocked)
           </button>
         </div>
+        <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+          <button class="access-btn program-level-btn active" onclick="setUnlockedDayLimit(1)" style="font-size: 9px; padding: 4px; border-radius: 6px;">Day 1</button>
+          <button class="access-btn program-level-btn" onclick="setUnlockedDayLimit(2)" style="font-size: 9px; padding: 4px; border-radius: 6px;">Day 2</button>
+          <button class="access-btn program-level-btn" onclick="setUnlockedDayLimit(3)" style="font-size: 9px; padding: 4px; border-radius: 6px;">Day 3</button>
+          <button class="access-btn program-level-btn" onclick="setUnlockedDayLimit(4)" style="font-size: 9px; padding: 4px; border-radius: 6px;">Day 4</button>
+          <button class="access-btn program-level-btn" onclick="setUnlockedDayLimit(5)" style="font-size: 9px; padding: 4px; border-radius: 6px;">Day 5</button>
+        </div>
       </div>
 
       <div class="panel-section screen-selector-section">
@@ -174,7 +181,7 @@
             <!-- ============================================ -->
             <!-- SCREEN 1: Welcome Carousel Slide 1 -->
             <!-- ============================================ -->
-            <section id="screen-welcome-1" class="screen-view active">
+            <section id="screen-welcome-1" class="screen-view active" style="background: linear-gradient(180deg, rgba(14, 165, 233, 0.08) 0%, rgba(167, 139, 250, 0.06) 50%, rgba(249, 115, 22, 0.09) 100%) !important;">
               <!-- Marked Logo Addition Area -->
               <div class="logo-placeholder-area">
                 [ Logo Space ]
@@ -182,12 +189,17 @@
 
               <!-- Centered Clean Welcome Header -->
               <div class="welcome-header text-center mt-20">
-                <h1 class="welcome-title text-center">Congratulations,<br>your quit journey begins.</h1>
-                <p class="welcome-subtitle text-center mt-10">You have taken the first step toward reclaiming your health, energy, and freedom.</p>
+                <h1 class="welcome-title text-center"><span class="color-orange">Congratulations,</span><br>your quit journey begins.</h1>
+                <p class="welcome-subtitle text-center" style="margin-top: 24px;">You have taken the first step toward reclaiming your health, energy, and freedom.</p>
+              </div>
+
+              <!-- Welcome Triumph Image Hero -->
+              <div style="width: 100%; height: 165px; border-radius: 20px; overflow: hidden; margin-top: 15px; border: 1.5px solid var(--color-border-card); box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.12); flex-shrink: 0;">
+                <img src="welcome-hero.jpg" alt="Triumph on Quit Journey" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>
 
               <!-- Space buffer to keep the layout clean and balanced -->
-              <div style="flex-grow: 1; min-height: 40px;"></div>
+              <div style="flex-grow: 1; min-height: 20px;"></div>
 
               <!-- Clean Language Picker -->
               <div class="language-picker-container">
@@ -223,7 +235,7 @@
                 </div>
                 <h1 class="welcome-title-large">Quit smoking in 10 days,</h1>
                 <h2 class="welcome-title-medium">without cravings, guilt, or willpower.</h2>
-                <p class="welcome-subtitle-small">A personalised app-based program that helps you stop smoking forever.</p>
+                <p class="welcome-subtitle-small">A personalised app-based program that helps you quit smoking easily and permanently.</p>
               </div>
 
               <!-- Minimal progress timeline widget representing the 10 days journey -->
@@ -408,6 +420,26 @@
                   <h3>30+</h3>
                   <span>Countries Active</span>
                 </div>
+              </div>
+
+              <!-- Trust Badges Container -->
+              <div class="welcome-trust-badges" style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px; margin-bottom: 15px;">
+                
+                <div class="trust-badge-item glass-card" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--color-border-card);">
+                  <span style="font-size: 15px;">🔬</span>
+                  <span style="font-size: 11.5px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Clinically proven. 95% Quit Rate.</span>
+                </div>
+
+                <div class="trust-badge-item glass-card" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--color-border-card);">
+                  <span style="font-size: 15px;">👥</span>
+                  <span style="font-size: 11.5px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Developed by 10+ psychologists & ex-smokers</span>
+                </div>
+
+                <div class="trust-badge-item glass-card" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--color-border-card);">
+                  <span style="font-size: 15px;">🌍</span>
+                  <span style="font-size: 11.5px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">100% devotion to WHO guidelines & mission</span>
+                </div>
+
               </div>
 
               <!-- Bottom Indicator & CTAs -->
@@ -721,7 +753,6 @@
             <!-- ============================================ -->
             <section id="screen-insight-spent" class="screen-view">
               <div class="insight-container">
-                <div class="insight-pill">Emotional Reality Check</div>
                 <h2 class="welcome-title mt-10">This habit has cost more than you think.</h2>
                 <p class="welcome-subtitle">Based on your entries, here is the direct financial cost of smoking:</p>
 
@@ -1647,15 +1678,22 @@
             <!-- ============================================ -->
             <section id="screen-home" class="screen-view">
               <!-- Header -->
-              <header class="app-header">
-                <div class="header-left">
+              <header class="app-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;">
+                <button class="avatar-circle" onclick="jumpToScreen('profile')" style="flex-shrink: 0;"></button>
+                <div class="header-left" style="flex-grow: 1;">
                   <span class="greeting" id="dash-greeting">Good morning, Siddhi</span>
                   <p class="sub-greeting">Your day is looking beautiful</p>
                 </div>
-                <div class="header-right">
-                  <button class="avatar-circle" onclick="jumpToScreen('profile')"></button>
-                </div>
               </header>
+
+              <!-- Unlock Smono CTA Box -->
+              <div class="unlock-smono-box glass-card" id="home-unlock-smono-cta" onclick="jumpToScreen('offer')" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 16px; background: linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%); border: 1.5px solid var(--color-accent-orange); margin-top: 10px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.1); flex-shrink: 0;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 16px;">🔑</span>
+                  <span style="font-size: 13px; font-weight: 800; color: var(--color-orange-dark);">Unlock Smono</span>
+                </div>
+                <span style="font-size: 12px; font-weight: 800; color: var(--color-orange-dark);">Upgrade Now &rarr;</span>
+              </div>
 
               <!-- "Today I smoked" Tracker (Only active during first 10 days) -->
               <div class="today-smoked-tracker glass-card" id="today-smoked-tracker-widget">
@@ -1667,6 +1705,11 @@
                 </div>
                 <p class="tracker-caption">Log your cigarettes smoked today. Keep it low!</p>
               </div>
+
+              <!-- Huge Bold Header with Typewriter Effect -->
+              <h2 id="home-journey-title-header" style="font-size: 21px; font-weight: 800; line-height: 1.3; margin-top: 15px; margin-bottom: 10px; color: var(--color-text-primary); text-align: left; padding: 0 4px; font-family: var(--font-header); min-height: 58px; max-width: 100%; box-sizing: border-box; white-space: normal; word-break: break-word; overflow-wrap: break-word; display: block;">
+                Your New Journey Towards Freedom Begins
+              </h2>
 
               <!-- Day wise slider/tab system -->
               <div class="days-slider-container">
@@ -1777,7 +1820,11 @@
                   <p class="sub-greeting">Your dashboard statistics and streak toll</p>
                 </div>
                 <div class="header-right">
-                  <button class="avatar-circle" onclick="jumpToScreen('profile')"></button>
+                  <button class="quick-add-btn" onclick="openQuickAddPanel()" style="width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent-sky); color: white; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.25); outline: none;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                  </button>
                 </div>
               </header>
 
@@ -1845,7 +1892,8 @@
                 <span class="sos-arrow">→</span>
               </button>
 
-              <div style="flex-grow: 1;"></div>
+              <!-- Dynamic Insights & Analytics Container -->
+              <div id="tracker-insights-section" style="margin-top: 15px; margin-bottom: 75px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; padding-bottom: 20px;"></div>
 
               <!-- Bottom Tab Bar -->
               <nav class="app-tab-bar">
